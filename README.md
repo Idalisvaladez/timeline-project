@@ -15,7 +15,8 @@ A social media application that allows you to post events on your personal timel
 
 ## Data Models
 
-<img width="1277" alt="Screenshot 2023-10-24 at 2 27 42 PM" src="https://github.com/Idalisvaladez/timeline-project/assets/139524475/efc400ae-bc9b-4735-a50f-6688f94619e5">
+
+<img width="1353" alt="Screenshot 2023-10-24 at 2 51 22 PM" src="https://github.com/Idalisvaladez/timeline-project/assets/139524475/a6016262-1887-4845-9c2f-03e1500e55e8">
 
 
 
