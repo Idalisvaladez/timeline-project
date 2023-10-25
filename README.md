@@ -16,17 +16,20 @@ A social media application that allows you to post events on your personal timel
 ## Data Models
 
 
-<img width="1353" alt="Screenshot 2023-10-24 at 2 51 22 PM" src="https://github.com/Idalisvaladez/timeline-project/assets/139524475/a6016262-1887-4845-9c2f-03e1500e55e8">
+
+<img width="1231" alt="Data-Model" src="https://github.com/Idalisvaladez/timeline-project/assets/139524475/21f76dfa-47f8-43f5-917c-005c67ddcda6">
 
 
 
 
 ### Relationships
 
-- A ‘User’ has many ‘Events’
-- A ‘User’ has many ‘Friends’
-- A ‘User’ has many ‘Likes’ through ‘Events’
+- A ‘User’ has many ‘Comments’
+- A 'User' has many 'Events' through 'Comments'
+- A ‘User’ has many ‘Likes'
+- A ‘User’ has many ‘Events’ through ‘Likes’
 - An ‘Event’ has many ‘Likes’ & many ‘Comments’
+- An 'Event' has many 'Users' through 'Likes' & 'Comments'
 
 ### Validations and Contraints
 
@@ -64,10 +67,10 @@ A social media application that allows you to post events on your personal timel
 ### Homepage
 - GET /events
 - GET /users
-- DELETE /users/<int:id>/events/<int:id>/comments
-- PATCH /events/<int:id>/likes
+- DELETE /users/<int:id>/events/<int:id>/comments/<int:id>
+- PATCH /events/<int:id>/likes/<int:id>
 - POST /events/<int:id>/comments
-- PATCH /events/<int:id>/comments
+- PATCH /events/<int:id>/comments/<int:id>
 
 ### Login
 - POST /login
@@ -81,13 +84,12 @@ A social media application that allows you to post events on your personal timel
 - DELETE /events/<int:id>
 - PATCH /users/<int:id>
 - POST /events/<int:id>/comments
-- PATCH /events/<int:id>/comments
+- PATCH /events/<int:id>/comments/<int:id>
 
 ### NavBar
 - /home
 - /profile
 - /create-event
-- /search
 
 ---
 
@@ -108,3 +110,4 @@ Only include relevant info from users comments (i.e. the comment and username of
 - Create a real time chat messenger
 - Email verification signup message
 - Notifications tab that shows comments and likes
+- Friend requests/ friendships
