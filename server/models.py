@@ -1,9 +1,12 @@
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import validates
+from sqlalchemy.sql import func
+from datetime import *
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
-from config import db
+from config import db, bcrypt
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -12,7 +15,7 @@ class User(db.Model, SerializerMixin):
     name = db.Column(db.String)
     email = db.Column(db.String)
     username = db.Column(db.String, unique = True)
-    password = db.Column(db.String, nullable = False)
+    _password_hash = db.Column(db.String, nullable = False)
     profile_picture = db.Column(db.String, default = "https://pixabay.com/get/g85c3c97d1b6da4d7313d19607b5cc476c22a932d3ef3f2f583e5a52be957a98dda28167e027b7023b80462a4559ae1533d2c659e2408af13b2663921c385d2980f4c00a686e4b3c2efee025938b13916_640.png")
 
     # Relationship to intermediary models
@@ -20,7 +23,7 @@ class User(db.Model, SerializerMixin):
     likes = db.relationship('Like', backref='user', cascade = 'all, delete-orphan')
 
     # Prevent recursion error
-    serialize_rules = ("-comments.user", "-likes.user",)
+    serialize_rules = ("-comments.user", "-likes.user",'-events.user',)
 
     @validates('name')
     def validate_name(self, key, name):
@@ -49,21 +52,21 @@ class User(db.Model, SerializerMixin):
             return email
         else:
             raise ValueError("Must be a valid email")
-    
 
     
-    # @property
-    # def password(self):
-    #     return self.password
+    @hybrid_property
+    def password_hash(self):
+        return self._password_hash
+
+    @password_hash.setter
+    def password_hash(self, password):
+        if password:
+            password_hash = bcrypt.generate_password_hash(password.encode('utf-8'))
+            self._password_hash = password_hash.decode('utf-8')
+        else:
+            raise ValueError("Password Invalid")
+        
     
-    # @password.setter
-    # def password(self, password):
-    #     password_hash = bcrypt.generate_password_hash(password.encode('utf-8'))
-    #     self.password = password_hash.decode('utf-8')
-    
-    # def authenticate(self, password):
-    #     return bcrypt.check_password_hash(
-    #         self.password, password.encode('utf-8'))
     
     def __repr__(self):
         return f'<User {self.username}, ID {self.id}>'
@@ -75,7 +78,7 @@ class Comment(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key = True)
     comment = db.Column(db.String(500), nullable = False)
-    timestamp = db.Column(db.DateTime)
+    timestamp = db.Column(db.DateTime, default = datetime.utcnow)
 
     # Relationship to user and event
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -83,6 +86,15 @@ class Comment(db.Model, SerializerMixin):
 
     # Prevent recursion error
     serialize_rules = ("-user.comments", "-event.comments",)
+
+    @validates('comment')
+    def validate_comment(self, key, comment):
+        if comment and 1 <= len(comment) <= 500:
+            return comment
+        elif len(comment) > 500:
+            raise ValueError("Comment cannot excede 500 characters")
+        elif 1 <= len(comment):
+            raise ValueError("Comment cannot be empty")
 
     def __repr__(self):
         return f'<Comment {self.comment} at {self.timestamp}>'
@@ -113,7 +125,7 @@ class Event(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key = True)
     picture = db.Column(db.String, nullable = False)
     description = db.Column(db.String(500), nullable = True)
-    timestamp = db.Column(db.DateTime)
+    timestamp = db.Column(db.DateTime, default = datetime.utcnow)
 
     
     # Relationship to intermediary models
@@ -121,7 +133,7 @@ class Event(db.Model, SerializerMixin):
     likes = db.relationship('Like', backref='event', cascade = 'all, delete-orphan')
 
     # Prevent recursion errors
-    serialize_rules = ("-comments.event", "-likes.event",)
+    serialize_rules = ("-comments.event", "-likes.event", '-users.event',)
 
 
     def __repr__(self):

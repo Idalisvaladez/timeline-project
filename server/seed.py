@@ -18,7 +18,7 @@ def create_users():
             name = fake.name(),
             email = fake.email(),
             username = fake.user_name(),
-            password = fake.password(length= 12),
+            password_hash = fake.password(length= 12),
             profile_picture = fake.image_url(),
         )
         users.append(user)
