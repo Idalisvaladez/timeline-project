@@ -94,7 +94,7 @@ class UserByID(Resource):
         user = User.query.filter_by(id = id).first()
 
         if user:
-            return make_response(user.to_dict(rules = ('-comments', '-likes','-password','-email',)), 200)
+            return make_response(user.to_dict(rules = ('-comments', '-likes','-_password_hash','-email',)), 200)
         else:
             return make_response({"error": "No user found"}, 404)
         
@@ -200,6 +200,79 @@ class EventByID(Resource):
 
 api.add_resource(EventByID, '/events/<int:id>')
 
+class UserEvents(Resource):
+    def get(self, id):
+        user = User.query.filter_by(id=id).first()
+        if user:
+            likes = [like.to_dict(rules = ('-event.comments','-liked','-user_id','-event_id','-id',)) for like in Like.query.all() if like.user_id == user.id]
+
+
+            return make_response(likes, 200)
+        else:
+            return make_response({"error": "No user found"}, 404)
+
+
+api.add_resource(UserEvents, '/users/<int:id>/events')
+
+
+class UserEventsByID(Resource):
+    def get(self, user_id, event_id):
+        user = User.query.filter_by(id = user_id).first()
+        if user:
+            event = Event.query.filter_by(id = event_id).first()
+            if event:
+                return make_response({"user_id": user_id, "event_id": event_id, "event_details": event.to_dict(rules = ('-likes','-comments',))}, 200)
+            else:
+                return make_response({"error": "No event found for the user"}, 404)
+        else:
+            return make_response({"error": "No user found"}, 404)
+        
+        
+    def delete(self, user_id, event_id):
+        user = User.query.filter_by(id = user_id).first()
+        if user:
+            event = Event.query.filter_by(id = event_id).first()
+            if event:
+                db.session.delete(event)
+                db.session.commit()
+
+                return make_response({"Successfully deleted": True}, 204)
+            else:
+                return make_response({"error": "No event found for the user"}, 404)                
+        else:
+            return make_response({"error": "No user found"}, 404)
+        
+        
+    def patch(self, user_id, event_id):
+        user = User.query.filter_by(id = user_id).first()
+        if user:
+            event = Event.query.filter_by(id = event_id).first()
+            if event:
+                try:
+                    data = request.json
+                    for key, value in data.items():
+                        if hasattr(event, key):
+                            if key == 'timestamp':
+                                value = datetime.strptime(data['timestamp'], '%Y-%m-%d %H:%M:%S')
+                            setattr(event, key, value)
+
+                    db.session.add(event)
+                    db.session.commit()
+
+                    return make_response({"user_id": user_id, "event_id": event_id, "event_details": event.to_dict(rules = ('-likes','-comments',))}, 202)
+                
+                except ValueError as e:
+                    return make_response({"errors": ["validation errors"]}, 400)
+            else:
+                return make_response({"error": "No event found for the user"}, 404)
+        else:
+            return make_response({"error": "No user found"}, 404)
+        
+api.add_resource(UserEventsByID, '/users/<int:user_id>/events/<int:event_id>')
+
+
+
+
 class Comments(Resource):
     def get(self):
         comments = [comment.to_dict(only = ('id', 'comment', 'timestamp', 'user_id', 'event_id',)) for comment in Comment.query.all()]
@@ -227,6 +300,8 @@ class Comments(Resource):
 
 
 api.add_resource(Comments, '/comments')
+
+
 
 class CommentByID(Resource):
     def get(self, id):
@@ -270,6 +345,170 @@ class CommentByID(Resource):
 
 api.add_resource(CommentByID, '/comments/<int:id>')
 
+class EventComments(Resource):
+    def get(self, id):
+        event = Event.query.filter_by(id=id).first()
+        if event:
+            comments = [comment.to_dict(only = ('id', 'comment', 'user_id','event_id',)) for comment in Comment.query.all() if comment.event_id == event.id]
+
+
+            return make_response(comments, 200)
+        else:
+            return make_response({"error": "No user found"}, 404)
+
+
+api.add_resource(EventComments, '/events/<int:id>/comments')
+
+
+class UserEventComments(Resource):
+    def get(self, user_id, event_id):
+        user = User.query.filter_by(id = user_id).first()
+        if user:
+            event = Event.query.filter_by(id = event_id).first()
+            if event:
+                comments = [
+                    comment.to_dict(only=('id', 'comment', 'user_id', 'event_id',))
+                    for comment in Comment.query.filter_by(event_id=event.id).all()
+                ]
+                return make_response(comments, 200)
+            else:
+                return make_response({"error": "No event found"}, 404)
+        else:
+            return make_response({"error": "No user found"}, 404)
+
+
+api.add_resource(UserEventComments, '/users/<int:user_id>/events/<int:event_id>/comments')
+
+
+
+class UserEventComment(Resource):
+    def get(self, user_id, event_id, comment_id):
+        
+        user = User.query.filter_by(id = user_id).first()
+        if user:
+            event = Event.query.filter_by(id=event_id).first()
+            if event:
+                comment = Comment.query.filter_by(id=comment_id, event_id=event.id, user_id = user.id).first()
+                if comment:
+                    return make_response(comment.to_dict(only = ('comment', 'user','event', 'id','-event.likes','-user.likes',)), 200)
+                else:
+                    return make_response({"error": "No comment found for the event"}, 404)
+            else:
+                return make_response({"error": "No event found for the user"}, 404)
+        else:
+            return make_response({"error": "No user found"}, 404)
+        
+
+    def patch(self, user_id, event_id, comment_id):
+        user = User.query.filter_by(id = user_id).first()
+        if user:
+            event = Event.query.filter_by(id=event_id).first()
+            if event:
+                comment = Comment.query.filter_by(id=comment_id, event_id=event.id, user_id = user.id).first()
+                if comment:
+                    try:
+                        data = request.json
+                        for key, value in data.items():
+                            if hasattr(comment, key):
+                                if key == 'timestamp':
+                                    value = datetime.strptime(data['timestamp'], '%Y-%m-%d %H:%M:%S')
+                            setattr(comment, key, value)
+
+                        db.session.add(comment)
+                        db.session.commit()
+
+                        return make_response({"event_id": event_id, "comment_id": comment_id, "comment": comment.to_dict(only = ('comment', 'user',))}, 202)
+                    except ValueError as e:
+                        return make_response({"errors": ["validation errors"]}, 400)
+                else:
+                    return make_response({"error": "No comment found for the event"}, 404)
+            else:
+                return make_response({"error": "No event found for the user"}, 404)
+        else:
+            return make_response({"error": "No user found"}, 404)
+        
+    
+
+    def delete(self, user_id, event_id, comment_id):
+        user = User.query.filter_by(id = user_id).first()
+        if user:
+            event = Event.query.filter_by(id=event_id).first()
+            if event:
+                comment = Comment.query.filter_by(id=comment_id, event_id=event.id, user_id = user.id).first()
+                if comment:
+                    db.session.delete(comment)
+                    db.session.commit()
+
+                    return make_response({"Successfully deleted": True}, 204)
+                else:
+                    return make_response({"error": "No comment found"}, 404)
+            else:
+                return make_response({"error": "No event found"}, 404)                
+        else:
+            return make_response({"error": "No user found"}, 404)
+
+api.add_resource(UserEventComment, '/users/<int:user_id>/events/<int:event_id>/comments/<int:comment_id>')
+
+
+
+class EventsCommentByID(Resource):
+    def get(self, event_id, comment_id):
+        event = Event.query.filter_by(id= event_id).first()
+        if event:
+            comment = Comment.query.filter_by(id = comment_id).first()
+            if comment:
+                return make_response({"event_id": event_id, "comment_id": comment_id, "comment": comment.to_dict(only = ('user','comment',))}, 200)
+            else:
+                return make_response({"error": "No comment found for the event"}, 404)
+        else:
+            return make_response({"error": "No event found"}, 404)
+        
+        
+    def delete(self, event_id, comment_id):
+        event = Event.query.filter_by(id= event_id).first()
+        if event:
+            comment = Comment.query.filter_by(id = comment_id).first()
+            if comment:
+                db.session.delete(comment)
+                db.session.commit()
+
+                return make_response({"Successfully deleted": True}, 204)
+            else:
+                return make_response({"error": "No comment found for the event"}, 404)                
+        else:
+            return make_response({"error": "No event found"}, 404)
+        
+        
+    def patch(self, event_id, comment_id):
+        event = Event.query.filter_by(id= event_id).first()
+        if event:
+            comment = Comment.query.filter_by(id = comment_id).first()
+            if comment:
+                try:
+                    data = request.json
+                    for key, value in data.items():
+                        if hasattr(comment, key):
+                            if key == 'timestamp':
+                                value = datetime.strptime(data['timestamp'], '%Y-%m-%d %H:%M:%S')
+                            setattr(comment, key, value)
+
+                    db.session.add(comment)
+                    db.session.commit()
+
+                    return make_response({"event_id": event_id, "comment_id": comment_id, "comment": comment.to_dict(only = ('comment', 'user',))}, 202)
+                
+                except ValueError as e:
+                    return make_response({"errors": ["validation errors"]}, 400)
+            else:
+                return make_response({"error": "No comment found for the event"}, 404)
+        else:
+            return make_response({"error": "No event found"}, 404)
+
+
+api.add_resource(EventsCommentByID, '/events/<int:event_id>/comments/<int:comment_id>')
+
+
+
 
 class Likes(Resource):
     def get(self):
@@ -277,6 +516,23 @@ class Likes(Resource):
         return make_response(likes, 200)
 
 api.add_resource(Likes, '/likes')
+
+
+class LikesByEvent(Resource):
+    def get(self, id):
+        event = Event.query.filter_by(id = id).first()
+        if event:
+            likes = [like.to_dict(only = ('liked',)) for like in Like.query.all()]
+
+
+            return make_response(likes, 200)
+        else:
+            return make_response({"error": "No user found"}, 404)
+        
+
+
+api.add_resource(LikesByEvent, '/events/<int:id>/likes')
+
 
 
 class LikeByID(Resource):
