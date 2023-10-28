@@ -1,7 +1,8 @@
 import React from 'react';
 import { useRef, useEffect, useState } from 'react';
 import '@arco-design/web-react/dist/css/arco.css';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
 
 import {
   Form,
@@ -28,13 +29,13 @@ const noLabelLayout = {
   },
 };
 
-// const navigate = useNavigate();
-
 
 function Signup() {
     const formRef = useRef();
     const [size, setSize] = useState('default');
     const [layout, setLayout] = useState('vertical');
+    const navigate = useNavigate();
+
     useEffect(() => {
       formRef.current.setFieldsValue({
         rate: 5,
@@ -111,11 +112,11 @@ function Signup() {
               try {
                 await formRef.current.validate();
                 Message.info('Signup successful!');
-                // navigate('/home')
+                navigate('/home')
 
               } catch (_) {
                 console.log(formRef.current.getFieldsError());
-                Message.error('校验失败，请检查字段！');
+                Message.error('Signup failed!');
               }
             }
           }}
@@ -160,6 +161,7 @@ function Signup() {
         style={{
             fontSize: 20,
             fontFamily: 'Acme',
+            color: 'green',
         }}
     >
     Login
