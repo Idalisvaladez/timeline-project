@@ -2,7 +2,16 @@ import React from "react";
 import App from "./components/App";
 import "./index.css";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { ConfigProvider } from '@arco-design/web-react';
+import enUS from '@arco-design/web-react/es/locale/en-US';
 
 const container = document.getElementById("root");
 const root = createRoot(container);
-root.render(<App />);
+root.render(
+    <ConfigProvider locale = {enUS}>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </ConfigProvider>
+);
