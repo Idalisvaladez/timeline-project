@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Switch, Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 
 import UserDetailsProvider from "./UserDetails";
@@ -23,31 +23,17 @@ function App() {
   return (
     <div>
       {/* <Navbar /> */}
-      <Switch>
+      <Routes>
         {/* <UserDetailsProvider> */}
-          <Route path = '/edit-profile'>
-            <EditProfile />
-          </Route>
-          <Route path = '/profile'>
-            <ProfilePage />
-          </Route>
-          <Route path = '/create'>
-            <Create />
-          </Route>
-          <Route path = '/home'>
-            <Home />
-          </Route>
-          <Route path = '/login'>
-            <Login />
-          </Route>
-          <Route path = '/signup'>
-            <Signup />
-          </Route>
-          <Route exact path = '/'>
-            <Welcome />
-          </Route>
+          <Route path = '/edit-profile' element={<EditProfile />}/>
+          <Route path = '/profile' element={<ProfilePage />}/>
+          <Route path = '/create' element={<Create />} />
+          <Route path = '/home' element={<Home/>} />
+          <Route path = '/login' element = {<Login />} />
+          <Route path = '/signup' element ={<Signup />} />
+          <Route exact path = '/' element = {<Welcome />} />
         {/* </UserDetailsProvider> */}
-      </Switch>
+      </Routes>
     </div>
   )
 }
