@@ -1,6 +1,7 @@
-import React, {useState, useRef, useEffect}from 'react';
+import React, {useState, useRef, useEffect, useContext}from 'react';
 import { Timeline, Grid, Form, Input, Typography, Link, Button, Message } from '@arco-design/web-react';
 import { useNavigate } from 'react-router-dom';
+import { userDetailsContext } from '../components/UserDetails';
 
 const TimelineItem = Timeline.Item;
 const { Row } = Grid;
@@ -27,10 +28,12 @@ const noLabelLayout = {
 
 
 function Login() {
-    const [mode, setMode] = React.useState('alternate');
+    const [mode, setMode] = useState('alternate');
     const formRef = useRef();
     const [size, setSize] = useState('default');
     const [layout, setLayout] = useState('vertical');
+    const [userDetails, setUserDetails] = useContext(userDetailsContext);
+    const [userFound, setUserFound] = useState(true)
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -40,8 +43,39 @@ function Login() {
     }, []);
 
     const onValuesChange = (changeValue, values) => {
-        console.log('onValuesChange: ', changeValue, values);
+        const user = (changeValue, values);
+        setUserDetails(user)
       };
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+        let user = {
+            email: userDetails.email,
+            _password_hash: userDetails.password,
+        }
+        fetch('/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(user)
+        })
+        .then((res) => {
+            if (res.status === 201) {
+                console.log(user)
+                Message.info('Login successful')
+                navigate('/home')
+                return res.json()
+            } else if (res.status === 404) {
+                setUserFound(false)
+                Message.error('User not found. Please signup')
+            } else if (res.status === 403) {
+                Message.error('Incorrect password. Try again')
+            }
+        })
+        .then((data => 
+            setUserDetails(data))
+        )
+    }
+
 
     return(
         <div>
@@ -100,23 +134,11 @@ function Login() {
                     </FormItem>
                 </Form>
                 <Button
-                    onClick={async () => {
-                        if (formRef.current) {
-                        try {
-                            await formRef.current.validate();
-                            Message.info('Welcome back!');
-                            navigate('/home')
-
-                        } catch (_) {
-                            console.log(formRef.current.getFieldsError());
-                            Message.error('Login failed!');
-                        }
-                        }
-                    }}
+                    onClick={onSubmit}
                     type='primary'
                     style={{
                         width: 400,
-                        background: '#7BE188',
+                        background: '#CBE0C3',
                         position: 'relative',
                         margin: 'auto',
                         marginLeft: 50,
@@ -153,7 +175,7 @@ function Login() {
                     style={{
                         fontSize: 20,
                         fontFamily: 'Acme',
-                        color: 'green',
+                        color: 'lime-10',
                         position: 'absolute',
                     }}
                 >
@@ -231,12 +253,21 @@ function Login() {
             </Row>
         </TimelineItem>
         <TimelineItem>
+            <Row align='center'>
+                <div>
+                    Founded
+                </div>
+            </Row>
+        </TimelineItem>
+        <TimelineItem>
+            <Row align='center'>
+                <div>
+                    Founded
+                </div>
+            </Row>
+        </TimelineItem>
+        <TimelineItem>
           <Row align='center'>
-            <img
-              width='40'
-              style={imageStyle}
-              src='//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/73a34d47f2885cf5182d755aa0c8a7d4.png~tplv-uwbnlip3yd-png.png'
-            />
             <div style={{ marginBottom: 12, }} >
               Pipidance
               <div style={{ fontSize: 12, color: '#4E5969', }} >

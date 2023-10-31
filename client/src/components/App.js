@@ -14,26 +14,47 @@ import EditProfile from "../layout/EditProfile";
 
 
 function App() {
+  const [events, setEvents] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [users, setUsers] = useState([]);
 
 
+  useEffect(() => {
+    fetch('/events')
+      .then((res) => res.json())
+      .then((data) => {
+        setEvents(data)
+      });
+  }, []);
 
-  console.log(sessionStorage.getItem('currentUser'))
+  useEffect(() => {
+    fetch('/comments')
+    .then((res) => res.json())
+    .then(data => setComments(data))
+  }, [])
+
+  useEffect(() => {
+    fetch('/users')
+    .then((res) => res.json())
+    .then(data => setUsers(data))
+  }, [])
+
 
 
   return (
     <div>
       {/* <Navbar /> */}
-      <Routes>
-        {/* <UserDetailsProvider> */}
+      <UserDetailsProvider>
+        <Routes>
           <Route path = '/edit-profile' element={<EditProfile />}/>
           <Route path = '/profile' element={<ProfilePage />}/>
           <Route path = '/create' element={<Create />} />
-          <Route path = '/home' element={<Home/>} />
+          <Route path = '/home' element={<Home events = {events} comments = {comments} users = {users}/>} />
           <Route path = '/login' element = {<Login />} />
           <Route path = '/signup' element ={<Signup />} />
           <Route exact path = '/' element = {<Welcome />} />
-        {/* </UserDetailsProvider> */}
-      </Routes>
+        </Routes>
+      </UserDetailsProvider>
     </div>
   )
 }
