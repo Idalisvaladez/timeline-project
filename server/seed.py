@@ -86,7 +86,6 @@ if __name__ == '__main__':
         db.session.add_all(comments)
         db.session.commit()
 
-
         print("Seeding likes...")
         likes = create_likes(users, events)
         db.session.add_all(likes)

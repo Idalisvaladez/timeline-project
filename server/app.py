@@ -21,52 +21,62 @@ class Users(Resource):
         users = [user.to_dict(only = ('id', 'name', 'username','profile_picture')) for user in User.query.all()]
         return make_response(users, 200)
     
-    def post(self):
-        data = request.json
-        try:
-            new_user = User(
-                name = data['name'],
-                email = data['email'],
-                username = data['username'],
-                password = data['password'],
-                profile_picture = data['profile_picture'],
-            )
-
-            db.session.add(new_user)
-            db.session.commit()
-
-        except ValueError:
-            return make_response({"errors": ["validation errors"]})
 
 api.add_resource(Users, '/users')
 
+class Signup(Resource):
+    def post(self):
+        data = request.json
+        try: 
+            new_user = User(
+                    name = data['name'],
+                    email = data['email'],
+                    username = data['username'],
+                    password_hash = data['_password_hash'],
+                )
+            db.session.add(new_user)
+            db.session.commit()
+
+            session['user_id'] = new_user.id
+
+            return make_response(new_user.to_dict(), 201)
+        
+        except ValueError:
+            return make_response({'error': '422 Unprocessable Entity'}, 422)
+
+
+api.add_resource(Signup, '/signup')
 
 class Login(Resource):
-
-    def get(self):
-        data = request.json
-
-        user = User.query.filter_by(email = data['email']).first()
-
-        session['user_id'] = user.id
-        return user.to_dict()
 
     def post(self):
         data = request.json
         print(data['email'])
+        print(data['_password_hash'])
 
         user = User.query.filter_by(email = data['email']).first()
-        print(user)
+        password = data['_password_hash']
 
-        if user:
+        if user and user.authenticate(password):
             session['user_id'] = user.id
-            return user.to_dict()
-        elif user.password != data['password']:
+            return make_response(user.to_dict(rules = ('-password_hash',)), 201)
+        elif user._password_hash != data['_password_hash']:
             return make_response({"error": "incorrect password"}, 403)
         elif user is None:
             return make_response({"error": "user not found"}, 404)
         
 api.add_resource(Login, '/login')
+
+
+class Logout(Resource):
+
+    def delete(self):
+        session['user_id'] = None
+
+        return make_response({}, 204)
+    
+
+api.add_resource(Logout, '/logout')
 
 class CheckSession(Resource):
 
@@ -75,18 +85,11 @@ class CheckSession(Resource):
         if user:
             return user.to_dict()
         else:
-            return {'message': '401: Not Authorized'}, 401
+            return make_response({'message': '401: Not Authorized'}, 401)
 
 api.add_resource(CheckSession, '/check_session')
 
 
-class Logout(Resource):
-
-    def delete(self): 
-        session['user_id'] = None
-        return {'message': '204: No Content'}, 204
-
-api.add_resource(Logout, '/logout')
 
 
 class UserByID(Resource):
@@ -153,8 +156,10 @@ class Events(Resource):
             db.session.add(new_event)
             db.session.commit()
 
+            return make_response(new_event.to_dict(), 201)
+
         except ValueError:
-            return make_response({"errors": ["validation errors"]})
+            return make_response({"errors": ["validation errors"]}, 400)
 
 
 api.add_resource(Events, '/events')
@@ -204,8 +209,9 @@ class UserEvents(Resource):
     def get(self, id):
         user = User.query.filter_by(id=id).first()
         if user:
-            likes = [like.to_dict(rules = ('-event.comments','-liked','-user_id','-event_id','-id',)) for like in Like.query.all() if like.user_id == user.id]
-
+            likes = [like.to_dict(only = ('user_id', 'event_id', 'id',)) for like in Like.query.all() if like.user_id == user.id]
+            if likes:
+                events = [event.to_dict(only = {'id', 'description',}) for event in Event.query.all()]
 
             return make_response(likes, 200)
         else:

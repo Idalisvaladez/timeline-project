@@ -1,7 +1,8 @@
 import React from 'react';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useContext } from 'react';
 import '@arco-design/web-react/dist/css/arco.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 
 import {
@@ -12,6 +13,7 @@ import {
   Typography,
   Link,
 } from '@arco-design/web-react';
+import { userDetailsContext } from '../components/UserDetails';
 const FormItem = Form.Item;
 
 const formItemLayout = {
@@ -35,16 +37,56 @@ function Signup() {
     const [size, setSize] = useState('default');
     const [layout, setLayout] = useState('vertical');
     const navigate = useNavigate();
+    const [userDetails, SetUserDetails] = useContext(userDetailsContext);
+    const [userExists, setUserExists] = useState(false)
 
     useEffect(() => {
       formRef.current.setFieldsValue({
-        rate: 5,
       });
     }, []);
 
     const onValuesChange = (changeValue, values) => {
-        console.log('onValuesChange: ', changeValue, values);
+        const user = (changeValue, values)
+        SetUserDetails(user);
+        console.log("this is the user info: ", userDetails)
       };
+
+    
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+        let user = {
+            name: userDetails.fullname,
+            email: userDetails.email,
+            username: userDetails.username,
+            _password_hash: userDetails.password,
+        }
+        fetch("/signup", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(user),
+        })
+        .then(res => {
+            if (res.status === 201) {
+                Message.info('Signup successful!')
+                navigate('/home')
+                return res.json()
+            } else if (res.status === 500) {
+                setUserExists(true)
+                Message.error('User already exists. Please login')
+                console.error('User already exists')
+                // return Promise.reject("Username Already Exists")
+            } else if (res.status === 400) {
+                setUserExists(false)
+                console.error('All fields required to signup')
+                // return Promise.reject('All fields required to signup')
+            }
+        })
+        .then(data => {
+            SetUserDetails(data)
+        })
+        .catch((error) => console.error('Error: ', error));
+    }
 
    return (
     <>
@@ -88,9 +130,10 @@ function Signup() {
       {...formItemLayout}
       size={size}
       onValuesChange={onValuesChange}
+
       scrollToFirstError
     >
-      <FormItem label='Full Name' field='name' rules={[{ required: true }]}>
+      <FormItem label='Full Name' field='fullname' rules={[{ required: true }]}>
         <Input placeholder='Full name' />
       </FormItem>
       <FormItem label='Email' field='email' rules={[{ required: true }]}>
@@ -107,26 +150,14 @@ function Signup() {
       </FormItem>
       <FormItem {...noLabelLayout}>
         <Button
-          onClick={async () => {
-            if (formRef.current) {
-              try {
-                await formRef.current.validate();
-                Message.info('Signup successful!');
-                navigate('/home')
-
-              } catch (_) {
-                console.log(formRef.current.getFieldsError());
-                Message.error('Signup failed!');
-              }
-            }
-          }}
           type='primary'
           style={{
             width: 400,
-            background: '#7BE188',
+            background: '#CBE0C3',
             position: 'absolute',
             marginLeft: -80,
         }}
+            onClick={onSubmit}
         >
           Signup
         </Button>
@@ -161,7 +192,7 @@ function Signup() {
         style={{
             fontSize: 20,
             fontFamily: 'Acme',
-            color: 'green',
+            color: 'lime-10',
         }}
     >
     Login

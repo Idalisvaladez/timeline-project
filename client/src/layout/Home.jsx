@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useState } from 'react';
 import { Button, Layout, Menu, Typography } from '@arco-design/web-react';
 import { IconHome, IconUser, IconPlusCircle } from '@arco-design/web-react/icon';
 import { useNavigate } from 'react-router-dom';
-
+import { userDetailsContext } from '../components/UserDetails';
+import Events from '../components/Events';
+import Comments from '../components/Comments';
 
 const MenuItem = Menu.Item;
 
@@ -14,9 +16,10 @@ const normalWidth = 220;
 
 
 
-function Home() {
+function Home({events, comments, users}) {
     const [collapsed, setCollapsed] = useState(false);
     const [siderWidth, setSiderWidth] = useState(normalWidth);
+    const [userDetails, setUserDetails] = useContext(userDetailsContext)
     const navigate = useNavigate();
 
     const onCollapse = (collapsed) => {
@@ -34,6 +37,22 @@ function Home() {
         }
     };
 
+    const handleLogout = () => {
+        fetch('/logout', {
+            method: 'DELETE',
+        })
+        .then((res) => {
+            if (res.ok) {
+                setUserDetails(null)
+                navigate('/login')
+            }
+        })
+    }
+
+
+    const displayComments = comments.map((comment) => <Comments key = {comment.id} comments = {comment} users = {users}/>)
+
+    const displayEvents = events.map((event) => <Events key = {event.id} events = {event} comments = {displayComments}/>)
 
     return (
         <Layout className='byte-layout-collapse-demo' style={{
@@ -85,7 +104,7 @@ function Home() {
             <Button
             type='primary'
             style ={{
-                background: '#7BE188',
+                background: '#CBE0C3',
                 position: 'absolute',
                 bottom: 0,
                 width: '100%',
@@ -97,9 +116,7 @@ function Home() {
                 textAlign: 'center',
                 
             }}
-            onClick={ () => {
-                    navigate('/login') 
-            }}
+            onClick={handleLogout}
             >
             Logout
             </Button>
@@ -107,39 +124,7 @@ function Home() {
         </Sider>
         <Content style={{ background: 'rgb(240,255,255)', textAlign: 'center', padding: '30px', overflow: 'scroll'}}>
             <div style={{ width: '100%', height: '100%', overflow: 'scroll',}}>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-
+                {displayEvents}
             </div>
         </Content>
       </Layout>
