@@ -1,20 +1,25 @@
 import React, {useState} from 'react';
-import { Timeline, Grid } from '@arco-design/web-react';
+import {Timeline, Grid } from '@arco-design/web-react';
+import Comments from './Comments';
+import CommentForm from './CommentForm';
 
 const TimelineItem = Timeline.Item;
 const { Row, Col } = Grid;
 
 const imageStyle = {
-  width: 200,
-  height: 200,
+  width: 300,
+  height: 300,
 }
 
 
-function Events({events, comments}) {
-    const {description, picture, timestamp} = events
+function Events({events, comments, users, handleAddComment}) {
+    const {id, description, picture, timestamp} = events
     const [mode, setMode] = useState('alternate');
-    //console.log(events)
 
+    const filteredComments = comments.filter((comment) => comment.event_id === id)
+    const displayComments = filteredComments.map((comment) => <Comments key ={comment.id} comments = {comment} users ={users}/>)
+
+    
 
     return (
         <div>
@@ -32,14 +37,12 @@ function Events({events, comments}) {
               style={imageStyle}
               src= {picture}
             />
-            <div style={{ marginBottom: 12, width:200, }}>
+            <div style={{ marginBottom: 12, width:300, }}>
               {description}
-              <div style={{ fontSize: 12, color: '#4E5969' }}>{comments}</div>
+              <div style={{ fontSize: 12, color: '#4E5969', overflow: 'scroll', maxHeight: 200,}}>{displayComments}</div>
+              <CommentForm events ={events} handleAddComment={handleAddComment}/>
             </div>
           </Row>
-          <TimelineItem>
-
-          </TimelineItem>
         </TimelineItem>
       </Timeline>
     </div>

@@ -1,11 +1,13 @@
 import React, { useContext } from 'react';
 import { useState } from 'react';
-import { Button, Layout, Menu, Typography } from '@arco-design/web-react';
-import { IconHome, IconUser, IconPlusCircle } from '@arco-design/web-react/icon';
+import { Button, Layout, Menu, Typography, Modal } from '@arco-design/web-react';
+import { IconHome, IconUser } from '@arco-design/web-react/icon';
 import { useNavigate } from 'react-router-dom';
-import { userDetailsContext } from '../components/UserDetails';
+import { useUser } from '../components/UserDetails';
 import Events from '../components/Events';
-import Comments from '../components/Comments';
+import Create from './Create';
+
+
 
 const MenuItem = Menu.Item;
 
@@ -16,11 +18,12 @@ const normalWidth = 220;
 
 
 
-function Home({events, comments, users}) {
+function Home({events, comments, users, handleAddEvent, handleAddComment}) {
     const [collapsed, setCollapsed] = useState(false);
     const [siderWidth, setSiderWidth] = useState(normalWidth);
-    const [userDetails, setUserDetails] = useContext(userDetailsContext)
+    const [userDetails, setUserDetails] = useUser();
     const navigate = useNavigate();
+  
 
     const onCollapse = (collapsed) => {
         setCollapsed(collapsed);
@@ -38,26 +41,22 @@ function Home({events, comments, users}) {
     };
 
     const handleLogout = () => {
-        fetch('/logout', {
-            method: 'DELETE',
-        })
-        .then((res) => {
-            if (res.ok) {
-                setUserDetails(null)
-                navigate('/login')
-            }
-        })
+        setUserDetails(null)
+        localStorage.removeItem('userDetails')
+        navigate('/login')
     }
+  
 
 
-    const displayComments = comments.map((comment) => <Comments key = {comment.id} comments = {comment} users = {users}/>)
 
-    const displayEvents = events.map((event) => <Events key = {event.id} events = {event} comments = {displayComments}/>)
-
+    const displayEvents = events.map((event) => <Events key = {event.id} events = {event} comments = {comments} users = {users} handleAddComment={handleAddComment}/>)
+    
+    
     return (
         <Layout className='byte-layout-collapse-demo' style={{
             height: '100%',
         }}>
+          
         <Sider
           theme='light'
           onCollapse={onCollapse}
@@ -67,24 +66,27 @@ function Home({events, comments, users}) {
             onMoving: handleMoving,
           }}
         >
-          <div className='logo'
-           />
-           <Typography.Title delete  bold style={{
+          <div className='logo'/>
+          <Menu autoOpen style = {{height: 70,}}>
+          <Typography.Title delete  bold style={{
                 fontFamily: 'Acme',
                 fontSize: 60, 
                 top: 0,
+                right: 50,
                 position: 'absolute',
                 margin: 'auto',
                 textAlign: 'center',
            }}>
             TIME
             </Typography.Title>
-          <Menu theme='light' autoOpen style={{ width: '100%', height: '100%', border: '1px solid var(--color-border)',
-            borderColor: 'red'}}>
+          </Menu>
+          
+          <Menu theme='light' autoOpen style={{ width: '100%', height: '100%',}}>
             <MenuItem key='1' disabled>
               <IconHome />
                 Home
             </MenuItem>
+            
             <MenuItem 
                 key='2' 
                 onClick={ () => {
@@ -93,14 +95,7 @@ function Home({events, comments, users}) {
               <IconUser />
               Profile
             </MenuItem>
-            <MenuItem 
-                key='3'
-                onClick={ () => {
-                    navigate('/create') 
-            }}>
-              <IconPlusCircle/>
-              Create
-            </MenuItem>
+            <Create handleAddEvent={handleAddEvent}/>
             <Button
             type='primary'
             style ={{

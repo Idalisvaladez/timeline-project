@@ -5,13 +5,16 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { ConfigProvider } from '@arco-design/web-react';
 import enUS from '@arco-design/web-react/es/locale/en-US';
+import UserDetailsProvider from "./components/UserDetails";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(
     <ConfigProvider locale = {enUS}>
         <BrowserRouter>
-            <App />
+            <UserDetailsProvider>
+                <App />
+            </UserDetailsProvider>
         </BrowserRouter>
     </ConfigProvider>
 );

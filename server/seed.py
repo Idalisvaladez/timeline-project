@@ -48,10 +48,11 @@ def create_likes(users, events):
         likes.append(like)
     return likes
 
-def create_events():
+def create_events(users):
     events = []
     for _ in range(10):
         event = Event(
+            user_id = rc(users).id,
             picture = fake.image_url(),
             description = fake.sentence(nb_words = 10),
             timestamp = fake.date_time(),
@@ -77,7 +78,7 @@ if __name__ == '__main__':
         db.session.commit()
 
         print("Seeding events...")
-        events = create_events()
+        events = create_events(users)
         db.session.add_all(events)
         db.session.commit()
 

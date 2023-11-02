@@ -18,7 +18,7 @@ from models import User, Event, Comment, Like
 
 class Users(Resource):
     def get(self):
-        users = [user.to_dict(only = ('id', 'name', 'username','profile_picture')) for user in User.query.all()]
+        users = [user.to_dict(rules = ('-_password_hash','-comments','-likes', '-events',)) for user in User.query.all()]
         return make_response(users, 200)
     
 
@@ -59,7 +59,7 @@ class Login(Resource):
 
         if user and user.authenticate(password):
             session['user_id'] = user.id
-            return make_response(user.to_dict(rules = ('-password_hash',)), 201)
+            return make_response(user.to_dict(only = ('id', 'email', 'name', 'username','profile_picture',)), 201)
         elif user._password_hash != data['_password_hash']:
             return make_response({"error": "incorrect password"}, 403)
         elif user is None:
@@ -124,7 +124,7 @@ class UserByID(Resource):
                 db.session.add(user)
                 db.session.commit()
 
-                return make_response(user.to_dict(only = ('id', 'name', 'username','profile_picture',)), 201)
+                return make_response(user.to_dict(only = ('id', 'name', 'username','email','profile_picture',)), 202)
             except ValueError:
                 return make_response({"errors": ["validation errors"]}, 400)
         else:
@@ -139,24 +139,22 @@ api.add_resource(UserByID, '/users/<int:id>')
 
 class Events(Resource):
     def get(self):
-        events = [event.to_dict(rules = ('-comments', '-likes',)) for event in Event.query.all()]
+        events = [event.to_dict(only = ('id', 'user_id', 'picture', 'description','timestamp',)) for event in Event.query.all()]
         return make_response(events, 200)
     
     def post(self):
         data = request.json
 
-        if data['timestamp']:
-            fixed_date = datetime.strptime(data['timestamp'], '%Y-%m-%d %H:%M:%S')
         try:
             new_event = Event(
+                user_id = data['user_id'],
                 picture = data['picture'],
                 description = data['description'],
-                timestamp = fixed_date,
             )
             db.session.add(new_event)
             db.session.commit()
 
-            return make_response(new_event.to_dict(), 201)
+            return make_response(new_event.to_dict(only = ('id', 'user_id', 'picture', 'description',)), 201)
 
         except ValueError:
             return make_response({"errors": ["validation errors"]}, 400)
@@ -196,7 +194,7 @@ class EventByID(Resource):
                 db.session.add(event)
                 db.session.commit()
 
-                return make_response(event.to_dict(only = ('id', 'picture', 'description', 'timestamp',)), 201)
+                return make_response(event.to_dict(only = ('id', 'picture', 'description', 'timestamp',)), 202)
             except ValueError:
                 return make_response({"errors": ["validation errors"]}, 400)
         else:
@@ -281,28 +279,27 @@ api.add_resource(UserEventsByID, '/users/<int:user_id>/events/<int:event_id>')
 
 class Comments(Resource):
     def get(self):
-        comments = [comment.to_dict(only = ('id', 'comment', 'timestamp', 'user_id', 'event_id',)) for comment in Comment.query.all()]
+        comments = [comment.to_dict(rules = ('-event','-user',)) for comment in Comment.query.all()]
         return make_response(comments, 200)
     
     def post(self):
         data = request.json
 
-        if data['timestamp']:
-            fixed_date = datetime.strptime(data['timestamp'], '%Y-%m-%d %H:%M:%S')
-
+        
         try:
             new_comment = Comment(
                 comment = data['comment'],
-                timestamp = fixed_date,
                 user_id = data['user_id'],
                 event_id = data['event_id'],
             )
 
             db.session.add(new_comment)
             db.session.commit()
+
+            return make_response(new_comment.to_dict(rules = ('-event', '-user',)), 201)
             
         except ValueError:
-            return make_response({"errors": ["validation errors"]})
+            return make_response({"errors": ["validation errors"]}, 400)
 
 
 api.add_resource(Comments, '/comments')
@@ -518,7 +515,7 @@ api.add_resource(EventsCommentByID, '/events/<int:event_id>/comments/<int:commen
 
 class Likes(Resource):
     def get(self):
-        likes = [like.to_dict(only = ('id', 'liked', 'user_id', 'event_id',)) for like in Like.query.all()]
+        likes = [like.to_dict(rules = ('-event', '-comments','-user',)) for like in Like.query.all()]
         return make_response(likes, 200)
 
 api.add_resource(Likes, '/likes')

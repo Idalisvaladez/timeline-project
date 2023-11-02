@@ -4,6 +4,10 @@ import { Button, Layout, Menu, Typography } from '@arco-design/web-react';
 import { IconHome, IconUser, IconPlusCircle } from '@arco-design/web-react/icon';
 import { useNavigate } from 'react-router-dom';
 import { userDetailsContext } from '../components/UserDetails';
+import { useUser } from '../components/UserDetails';
+import Create from './Create';
+import MyEvents from '../components/MyEvents';
+import UserInfo from '../components/UserInfo';
 
 
 const MenuItem = Menu.Item;
@@ -15,10 +19,10 @@ const normalWidth = 220;
 
 
 
-function ProfilePage() {
+function ProfilePage({events, comments, handleDeleteMyEvent, handleAddEvent, handleUpdateEvent}) {
     const [collapsed, setCollapsed] = useState(false);
     const [siderWidth, setSiderWidth] = useState(normalWidth);
-    const [userDetails, setUserDetails] = useContext(userDetailsContext)
+    const [userDetails, setUserDetails] = useUser();
     const navigate = useNavigate();
 
     const onCollapse = (collapsed) => {
@@ -37,17 +41,15 @@ function ProfilePage() {
     };
 
     const handleLogout = () => {
-        fetch('/logout', {
-            method: 'DELETE',
-        })
-        .then((res) => {
-            if (res.ok) {
-                setUserDetails(null)
-                navigate('/login')
-            }
-        })
-    }
+      setUserDetails(null)
+      localStorage.removeItem('userDetails')
+      navigate('/login')
+  }
 
+    const filterMyEvents = events.filter((event) => event.user_id === userDetails.id)
+    const displayMyEvents = filterMyEvents.map((event) => <MyEvents key = {event.id} events ={event} comments={comments} handleDeleteMyEvent={handleDeleteMyEvent} handleUpdateEvent={handleUpdateEvent}/>)
+
+    
 
     return (
         <Layout className='byte-layout-collapse-demo' style={{
@@ -62,40 +64,34 @@ function ProfilePage() {
             onMoving: handleMoving,
           }}
         >
-          <div className='logo'
-           />
-           <Typography.Title delete  bold style={{
+          <div className='logo'/>
+          <Menu autoOpen style = {{height: 70,}}>
+          <Typography.Title delete  bold style={{
                 fontFamily: 'Acme',
                 fontSize: 60, 
                 top: 0,
+                right: 50,
                 position: 'absolute',
                 margin: 'auto',
                 textAlign: 'center',
            }}>
             TIME
             </Typography.Title>
-          <Menu theme='light' autoOpen style={{ width: '100%', height: '100%', border: '1px solid var(--color-border)',
-            borderColor: 'red'}}>
-            <MenuItem key='1' disabled>
+          </Menu>
+          <Menu theme='light' autoOpen style={{ width: '100%', height: '100%',}}>
+            <MenuItem key='1' onClick={ () => {
+                    navigate('/home') 
+                }}>
               <IconHome />
                 Home
             </MenuItem>
             <MenuItem 
                 key='2' 
-                onClick={ () => {
-                    navigate('/profile') 
-                }}>
+                disabled>
               <IconUser />
               Profile
             </MenuItem>
-            <MenuItem 
-                key='3'
-                onClick={ () => {
-                    navigate('/create') 
-            }}>
-              <IconPlusCircle/>
-              Create
-            </MenuItem>
+            <Create handleAddEvent={handleAddEvent}/>
             <Button
             type='primary'
             style ={{
@@ -117,41 +113,12 @@ function ProfilePage() {
             </Button>
           </Menu>
         </Sider>
-        <Content style={{ background: 'rgb(240,255,255)', textAlign: 'center', padding: '30px', overflow: 'scroll'}}>
-            <div style={{ width: '100%', height: '100%', overflow: 'scroll',}}>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-                <h1>Content</h1>
-
+        <Content >
+            <div>
+              <UserInfo />
+            </div>
+            <div style={{ background: 'rgb(240,255,255)', textAlign: 'center', padding: '30px', overflow: 'scroll'}}>
+              {displayMyEvents}
             </div>
         </Content>
       </Layout>
