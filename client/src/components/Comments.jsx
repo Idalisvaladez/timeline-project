@@ -1,5 +1,8 @@
-import React, {useState} from 'react';
-import { Comment, List } from '@arco-design/web-react';
+import React, {useState, useContext} from 'react';
+import { List, Input } from '@arco-design/web-react';
+import UserDisplay from './UserDisplay';
+import { useUser } from '../components/UserDetails';
+
 import {
   IconHeart,
   IconMessage,
@@ -8,44 +11,25 @@ import {
   IconStar,
 } from '@arco-design/web-react/icon';
 
+
+
 function Comments({comments, users}) {
     const [likes, setLikes] = useState([]);
-    const {comment, event_id, timestamp, user_id} = comments
-    console.log(users.username)
-    
-    
-    
-     const displayedUser = () => {
-        users.filter((user) => user.id === comment.user_id)
-     }
+    const [userDetails, setUserDetails] = useUser();
+    const {id, event_id, user_id, timestamp, comment} = comments
+   
 
+    
+    const filteredUser = users.filter((user) => user.id === user_id)
+    const userInfo = filteredUser.map((user) => <UserDisplay key = {user.id} users = {user} comments = {comments} timestamp = {timestamp}/>)
+    
 
     return (
-        <List bordered={false} header={<span></span>}>
-          <List.Item key={comments.id}>
-            <Comment
-            //   avatar={profile_picture}
-              content={comment}
-              datetime={timestamp}
-            //   actions={[
-            //     <button
-            //       className='custom-comment-action'
-            //       key='heart'
-            //       onClick={() =>
-            //         setLikes(like ? likes.filter((x) => x !== comm.id) : [...likes, comm.id])
-            //       }
-            //     >
-            //       {like ? (
-            //         <IconHeartFill style={{ color: '#f53f3f' }}/>
-            //       ) : (
-            //         <IconHeart />
-            //       )}
-            //       {comm.like + (like ? 1 : 0)}
-            //     </button>,
-            //   ]}
-            />
+        <List bordered={true} >
+          <List.Item key ={id} style={{overflow: 'scroll'}}>
+            {userInfo}
           </List.Item>
-    </List>
+        </List>
     )
 }
 

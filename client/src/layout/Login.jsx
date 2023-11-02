@@ -2,6 +2,7 @@ import React, {useState, useRef, useEffect, useContext}from 'react';
 import { Timeline, Grid, Form, Input, Typography, Link, Button, Message } from '@arco-design/web-react';
 import { useNavigate } from 'react-router-dom';
 import { userDetailsContext } from '../components/UserDetails';
+import { useUser } from '../components/UserDetails';
 
 const TimelineItem = Timeline.Item;
 const { Row } = Grid;
@@ -29,18 +30,13 @@ const noLabelLayout = {
 
 function Login() {
     const [mode, setMode] = useState('alternate');
-    const formRef = useRef();
     const [size, setSize] = useState('default');
     const [layout, setLayout] = useState('vertical');
-    const [userDetails, setUserDetails] = useContext(userDetailsContext);
+    const [userDetails, setUserDetails] = useUser();
     const [userFound, setUserFound] = useState(true)
     const navigate = useNavigate();
 
-    useEffect(() => {
-      formRef.current.setFieldsValue({
-        rate: 5,
-      });
-    }, []);
+
 
     const onValuesChange = (changeValue, values) => {
         const user = (changeValue, values);
@@ -60,7 +56,6 @@ function Login() {
         })
         .then((res) => {
             if (res.status === 201) {
-                console.log(user)
                 Message.info('Login successful')
                 navigate('/home')
                 return res.json()
@@ -115,11 +110,11 @@ function Login() {
                         right: 0,
                         margin: 'auto',
                     }}
-                    ref={formRef}
                     layout = {layout}
                     autoComplete='off'
                     {...formItemLayout}
                     size={size}
+                    initialValues={{email: '', password: ''}}
                     onValuesChange={onValuesChange}
                     scrollToFirstError
                     >
@@ -127,9 +122,10 @@ function Login() {
                         <Input placeholder='Email' />
                     </FormItem>
                     <FormItem label='Password' field='password' rules={[{ required: true , minLength: 12}]}>
-                        <Input 
+                        <Input.Password
                             placeholder='Password' 
-                            type='password'
+                            defaultVisibility = {false}
+                            
                         />
                     </FormItem>
                 </Form>

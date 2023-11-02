@@ -21,9 +21,10 @@ class User(db.Model, SerializerMixin):
     # Relationship to intermediary models
     comments = db.relationship('Comment', backref = 'user', cascade= 'all, delete-orphan')
     likes = db.relationship('Like', backref='user', cascade = 'all, delete-orphan')
+    events = db.relationship('Event', backref= 'user', cascade = 'all, delete-orphan')
 
     # Prevent recursion error
-    serialize_rules = ("-comments.user", "-likes.user",'-events.user',)
+    serialize_rules = ("-comments.user", "-likes.user",'-events.user','-events.comments.user', '-events.likes.user',)
 
     @validates('name')
     def validate_name(self, key, name):
@@ -125,6 +126,7 @@ class Event(db.Model, SerializerMixin):
     __tablename__ = 'events'
 
     id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     picture = db.Column(db.String, nullable = False)
     description = db.Column(db.String(500), nullable = True)
     timestamp = db.Column(db.DateTime, default = datetime.utcnow)

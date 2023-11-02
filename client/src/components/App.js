@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useParams } from "react-router-dom";
 
 
-import UserDetailsProvider from "./UserDetails";
+
 import Welcome from '../layout/Welcome';
 import Signup from '../layout/Signup';
 import Login from "../layout/Login";
@@ -15,8 +15,8 @@ import EditProfile from "../layout/EditProfile";
 
 function App() {
   const [events, setEvents] = useState([]);
-  const [comments, setComments] = useState([]);
   const [users, setUsers] = useState([]);
+  const [comments, setComments] = useState([]);
 
 
   useEffect(() => {
@@ -27,11 +27,6 @@ function App() {
       });
   }, []);
 
-  useEffect(() => {
-    fetch('/comments')
-    .then((res) => res.json())
-    .then(data => setComments(data))
-  }, [])
 
   useEffect(() => {
     fetch('/users')
@@ -39,22 +34,63 @@ function App() {
     .then(data => setUsers(data))
   }, [])
 
+ 
+  useEffect(() => {
+    fetch('/comments')
+    .then((res) => res.json())
+    .then((comments) => {
+      setComments(comments)
+    })
+  }, [])
 
+  const handleAddEvent = (new_event) => {
+    setEvents([...events, new_event])
+  }
+
+  const handleDeleteMyEvent = (deletedEvent) => {
+    const updatedEvents = events.filter((event) => event.id !== deletedEvent.id)
+    setEvents(updatedEvents)
+  }
+
+  const handleUpdateEvent = (edited_event) => {
+    const edited_events = events.map((event) => {
+      if (event.id === edited_event.id) {
+        return edited_event
+      } else {
+        return event
+      }
+    })
+    setEvents(edited_events)
+  }
+
+  const handleAddComment = (new_comment) => {
+    setComments([...comments, new_comment])
+  }
 
   return (
     <div>
       {/* <Navbar /> */}
-      <UserDetailsProvider>
         <Routes>
           <Route path = '/edit-profile' element={<EditProfile />}/>
-          <Route path = '/profile' element={<ProfilePage />}/>
-          <Route path = '/create' element={<Create />} />
-          <Route path = '/home' element={<Home events = {events} comments = {comments} users = {users}/>} />
+          <Route path = '/profile' element={<ProfilePage 
+                                              events = {events} 
+                                              comments={comments} 
+                                              handleDeleteMyEvent={handleDeleteMyEvent} 
+                                              handleAddEvent={handleAddEvent}
+                                              handleUpdateEvent={handleUpdateEvent}
+                                              />}/>
+          <Route path = '/create' element={<Create events = {events} users = {users} comments = {comments} />}/>
+          <Route path = '/home' element={<Home 
+                                            events = {events} 
+                                            users = {users} 
+                                            comments = {comments} 
+                                            handleAddEvent = {handleAddEvent}
+                                            handleAddComment ={handleAddComment} 
+                                          />} />
           <Route path = '/login' element = {<Login />} />
           <Route path = '/signup' element ={<Signup />} />
           <Route exact path = '/' element = {<Welcome />} />
         </Routes>
-      </UserDetailsProvider>
     </div>
   )
 }

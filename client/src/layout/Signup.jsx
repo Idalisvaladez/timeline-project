@@ -75,11 +75,9 @@ function Signup() {
                 setUserExists(true)
                 Message.error('User already exists. Please login')
                 console.error('User already exists')
-                // return Promise.reject("Username Already Exists")
             } else if (res.status === 400) {
                 setUserExists(false)
                 console.error('All fields required to signup')
-                // return Promise.reject('All fields required to signup')
             }
         })
         .then(data => {
@@ -143,9 +141,9 @@ function Signup() {
         <Input placeholder='Username' />
       </FormItem>
       <FormItem label='Password' field='password' rules={[{ required: true , minLength: 12}]}>
-        <Input 
+        <Input.Password 
             placeholder='Password' 
-            type='password'
+            defaultVisibility = {false}
         />
       </FormItem>
       <FormItem {...noLabelLayout}>
