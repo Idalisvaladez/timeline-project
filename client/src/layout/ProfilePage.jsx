@@ -3,11 +3,10 @@ import { useState } from 'react';
 import { Button, Layout, Menu, Typography } from '@arco-design/web-react';
 import { IconHome, IconUser, IconPlusCircle } from '@arco-design/web-react/icon';
 import { useNavigate } from 'react-router-dom';
-import { userDetailsContext } from '../components/UserDetails';
 import { useUser } from '../components/UserDetails';
 import Create from './Create';
-import MyEvents from '../components/MyEvents';
 import UserInfo from '../components/UserInfo';
+import EventsList from '../components/EventsList';
 
 
 const MenuItem = Menu.Item;
@@ -19,7 +18,7 @@ const normalWidth = 220;
 
 
 
-function ProfilePage({events, comments, handleDeleteMyEvent, handleAddEvent, handleUpdateEvent}) {
+function ProfilePage({events, handleDeleteMyEvent, handleAddEvent, handleUpdateEvent}) {
     const [collapsed, setCollapsed] = useState(false);
     const [siderWidth, setSiderWidth] = useState(normalWidth);
     const [userDetails, setUserDetails] = useUser();
@@ -46,10 +45,6 @@ function ProfilePage({events, comments, handleDeleteMyEvent, handleAddEvent, han
       navigate('/login')
   }
 
-    const filterMyEvents = events.filter((event) => event.user_id === userDetails.id)
-    const displayMyEvents = filterMyEvents.map((event) => <MyEvents key = {event.id} myEvents ={event} comments={comments} handleDeleteMyEvent={handleDeleteMyEvent} handleUpdateEvent={handleUpdateEvent}/>)
-
-    
 
     return (
         <Layout className='byte-layout-collapse-demo' style={{
@@ -117,9 +112,8 @@ function ProfilePage({events, comments, handleDeleteMyEvent, handleAddEvent, han
             <div>
               <UserInfo />
             </div>
-            <div style={{ background: 'rgb(240,255,255)', textAlign: 'center', padding: '30px', overflow: 'scroll'}}>
-              {displayMyEvents}
-            </div>
+              <EventsList events ={events} handleDeleteMyEvent={handleDeleteMyEvent} handleUpdateEvent={handleUpdateEvent}/>
+            
         </Content>
       </Layout>
     )

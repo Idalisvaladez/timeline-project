@@ -137,7 +137,7 @@ class Event(db.Model, SerializerMixin):
     likes = db.relationship('Like', backref='event', cascade = 'all, delete-orphan')
 
     # Prevent recursion errors
-    serialize_rules = ("-comments.event", "-likes.event", '-users.event',)
+    serialize_only = ('-comments.event', '-likes.event',)
 
 
     def __repr__(self):
