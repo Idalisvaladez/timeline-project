@@ -167,7 +167,7 @@ class EventByID(Resource):
         event = Event.query.filter_by(id = id).first()
 
         if event:
-            return make_response(event.to_dict(rules = ('-comments', '-likes',)), 200)
+            return make_response(event.to_dict(rules = ('-comments', '-likes','-user',)), 200)
         else:
             return make_response({"error": "No event found"}, 404)
         
@@ -194,7 +194,7 @@ class EventByID(Resource):
                 db.session.add(event)
                 db.session.commit()
 
-                return make_response(event.to_dict(only = ('id', 'picture', 'description', 'timestamp',)), 202)
+                return make_response(event.to_dict(only = ('id','description','picture', 'timestamp','user_id',)), 202)
             except ValueError:
                 return make_response({"errors": ["validation errors"]}, 400)
         else:

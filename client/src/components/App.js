@@ -46,24 +46,25 @@ function App() {
     setEvents([...events, new_event])
   }
 
-  const handleDeleteMyEvent = (deletedEvent) => {
-    const updatedEvents = events.filter((event) => event.id !== deletedEvent.id)
+  const handleDeleteMyEvent = (id) => {
+    const updatedEvents = events.filter((event) => event.id !== id)
     setEvents(updatedEvents)
   }
 
   const handleUpdateEvent = (edited_event) => {
     const edited_events = events.map((event) => {
       if (event.id === edited_event.id) {
-        console.log('edit from App.js', edited_event)
+        // console.log('edit from App.js', edited_event)
         return edited_event
       } else {
-        console.log('returning event from App.js')
+        // console.log('returning event from App.js')
         return event
       }
     })
-    console.log('after the handle update')
     setEvents(edited_events)
+    
   }
+  
 
   const handleAddComment = (new_comment) => {
     setComments([...comments, new_comment])
