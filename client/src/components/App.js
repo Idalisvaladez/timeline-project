@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes, useParams } from "react-router-dom";
+import { Route, Routes} from "react-router-dom";
 
 
 
 import Welcome from '../layout/Welcome';
 import Signup from '../layout/Signup';
 import Login from "../layout/Login";
-import Navbar from "../layout/Navbar";
 import Home from '../layout/Home';
 import Create from "../layout/Create";
 import ProfilePage from "../layout/ProfilePage";
@@ -55,11 +54,14 @@ function App() {
   const handleUpdateEvent = (edited_event) => {
     const edited_events = events.map((event) => {
       if (event.id === edited_event.id) {
+        console.log('edit from App.js', edited_event)
         return edited_event
       } else {
+        console.log('returning event from App.js')
         return event
       }
     })
+    console.log('after the handle update')
     setEvents(edited_events)
   }
 
@@ -85,6 +87,7 @@ function App() {
                                             users = {users} 
                                             comments = {comments} 
                                             handleAddEvent = {handleAddEvent}
+                                            handleDeleteMyEvent={handleDeleteMyEvent}
                                             handleAddComment ={handleAddComment} 
                                           />} />
           <Route path = '/login' element = {<Login />} />

@@ -11,9 +11,8 @@ const imageStyle = {
   height: 300,
 }
 
-function MyEvents({events, comments, handleDeleteMyEvent, handleUpdateEvent}) {
-    const {id, description, picture, timestamp, user_id} = events
-    // const {comment, event_id, user_id} = comments
+function MyEvents({handleDeleteMyEvent, handleUpdateEvent, myEvents}) {
+    const {id, description, picture, timestamp, user_id} = myEvents
     const [mode, setMode] = useState('alternate');
     const [edit, setEdit] = useState(false);
     const [userDetails, setUserDetails] = useUser();
@@ -66,7 +65,7 @@ function MyEvents({events, comments, handleDeleteMyEvent, handleUpdateEvent}) {
             <div style={{ marginBottom: 12, width:300, }}>
               {description}
               {user_id === userDetails.id ? eventButtons : ''}
-              {edit ? <EditEventForm handleEditEvent={handleEditEvent} events ={events} handleUpdateEvent={handleUpdateEvent}/> : null}
+              {edit ? <EditEventForm handleEditEvent={handleEditEvent} events ={myEvents} handleUpdateEvent={handleUpdateEvent}/> : null}
               <div style={{ fontSize: 12, color: '#4E5969' }}></div>
             </div>
           </Row>
