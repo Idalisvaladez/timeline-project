@@ -7,6 +7,7 @@ function CommentForm({events, handleAddComment}) {
     const [userDetails, setUserDetails] = useUser();
     const [eventId, setEventId] = useState('');
     const [newComment, setNewComment] = useState([])
+    const [form] = Form.useForm();
 
     const onValuesChange = (changeValue, values) => {
         const newComment = (changeValue, values)
@@ -30,6 +31,7 @@ function CommentForm({events, handleAddComment}) {
         .then(res => {
             if (res.status === 201) {
                 Message.success('Comment posted!');
+                form.resetFields({comment:''})
                 return res.json()
             } else if (res.status === 400) {
                 Message.error('Failed to post comment!')
@@ -56,6 +58,7 @@ function CommentForm({events, handleAddComment}) {
                     </Avatar>}
                 content={
                 <Form 
+                    form={form}
                     initialValues={{comment: ''}}
                     onValuesChange={onValuesChange}
                 >

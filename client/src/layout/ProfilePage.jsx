@@ -47,7 +47,7 @@ function ProfilePage({events, comments, handleDeleteMyEvent, handleAddEvent, han
   }
 
     const filterMyEvents = events.filter((event) => event.user_id === userDetails.id)
-    const displayMyEvents = filterMyEvents.map((event) => <MyEvents key = {event.id} events ={event} comments={comments} handleDeleteMyEvent={handleDeleteMyEvent} handleUpdateEvent={handleUpdateEvent}/>)
+    const displayMyEvents = filterMyEvents.map((event) => <MyEvents key = {event.id} myEvents ={event} comments={comments} handleDeleteMyEvent={handleDeleteMyEvent} handleUpdateEvent={handleUpdateEvent}/>)
 
     
 

@@ -17,23 +17,20 @@ function EditEventForm({events, handleUpdateEvent}) {
     const [form] = Form.useForm();
 
     const onValuesChange = (changeValue, values) => {
-        const newDescription = (changeValue, values)
-        setUpdateDes(newDescription)
-        console.log("this is the new event info: ", newDescription)
+        setUpdateDes(values)
+        console.log("this is the new event info: ", updateDes)
       };
 
     const onSubmit = (e) => {
         e.preventDefault();
-        let edited_event = {
-            description: updateDes.description,
-        }
         fetch(`/events/${id}`, {
             method: 'PATCH',
             headers: {'Content-Type' : 'application/json'},
-            body: JSON.stringify(edited_event)
+            body: JSON.stringify({description: updateDes.description})
         })
         .then((res) => {
             if (res.status === 202) {
+                console.log(`Editing ${id}`)
                 return res.json()
             } else if (res.status === 400) {
                 console.log('Please edit description before submitting')

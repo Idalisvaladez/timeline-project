@@ -12,7 +12,6 @@ function UserInfo() {
             {/* <Avatar size={150} style={{alignItems:'center', justifContent: 'center', marginRight: '16px', border: '1px'}}>{userPic}</Avatar>
             <Typography.Title style={{justifyContent: 'right'}}>@{userDetails.username}</Typography.Title>
             <Button style={{}}>Edit</Button> */}
-            {console.log(userDetails)}
         </div>
     )
 }

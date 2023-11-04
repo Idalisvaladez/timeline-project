@@ -14,11 +14,10 @@ const formItemLayout = {
   };
 
 
-function CreateForm({handleAddEvent}) {
+function CreateForm({handleAddEvent, visible, setVisible}) {
     const [userDetails, setUserDetails] = useUser();
     const [newEvent, setNewEvent] = useState([]);
     const [userId, setUserId] = useState('')
-    const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
 
@@ -46,8 +45,8 @@ function CreateForm({handleAddEvent}) {
             if (res.status === 201) {
                 setLoading(true);
                 Message.success('Event posted!');
+                setVisible(false)
                 setLoading(false);
-                setVisible(false);
                 return res.json()
             } else if (res.status === 400) {
                 setLoading(true);
@@ -85,8 +84,8 @@ function CreateForm({handleAddEvent}) {
                     <Input.TextArea 
                             placeholder="Add a description... " 
                             maxLength={{ length: 150, error: true}}
-                            showWordLimit
                             autoSize
+                            allowClear
                             wrapperStyle={{maxWidth: '100%'}}
                     />
             </FormItem>
@@ -94,7 +93,7 @@ function CreateForm({handleAddEvent}) {
                       <Button
                         onClick={() => {
                           setVisible(false);
-                          form.resetFields('')
+                          form.resetFields({picture: '', description: ''})
                         }}
                       >
                         Cancel

@@ -33,7 +33,7 @@ function Create({handleAddEvent}) {
                 footer={null}
           
             >
-                <CreateForm handleAddEvent={handleAddEvent}/>
+                <CreateForm handleAddEvent={handleAddEvent} setVisible={setVisible} visible={visible}/>
             </Modal>
         </div>
     )
