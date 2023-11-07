@@ -18,7 +18,7 @@ const normalWidth = 220;
 
 
 
-function Home({events, comments, users, handleAddEvent, handleAddComment}) {
+function Home({events, comments, users, handleAddEvent, handleAddComment, likes, handleAddLike, handleDeleteLike}) {
     const [collapsed, setCollapsed] = useState(false);
     const [siderWidth, setSiderWidth] = useState(normalWidth);
     const [userDetails, setUserDetails] = useUser();
@@ -49,7 +49,7 @@ function Home({events, comments, users, handleAddEvent, handleAddComment}) {
 
 
 
-    const displayEvents = events.map((event) => <Events key = {event.id} events = {event} comments = {comments} users = {users} handleAddComment={handleAddComment}/>)
+    const displayEvents = events.map((event) => <Events key = {event.id} events = {event} comments = {comments} users = {users} handleAddComment={handleAddComment} likes ={likes} handleAddLike={handleAddLike} handleDeleteLike={handleDeleteLike}/>)
     
     
     return (

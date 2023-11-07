@@ -53,9 +53,9 @@ function MyEvents({handleDeleteMyEvent, handleUpdateEvent, myEvents}) {
             mode={mode} 
             labelPosition='relative' 
             style = {{left: 0,}}
-            reverse = {true}
+            
         >
-        <TimelineItem label={timestamp}>
+        <TimelineItem label={timestamp} >
           <Row style={{ display: 'inline-grid', alignItems: 'stretch' }}>
             <img
               width='40'

@@ -43,15 +43,8 @@ function CommentForm({events, handleAddComment}) {
 
     return (
         <Comment
-                align='right'
-                actions={[
-                <Button key='0' type='secondary'>
-                    Cancel
-                </Button>,
-                <Button key='1' type='primary' onClick={onSubmit}>
-                    Post
-                </Button>,
-                ]}
+                align='left'
+                
                 avatar={
                     <Avatar>
                         <img alt ={userDetails.username} src ={userDetails.profile_picture}/>
@@ -61,18 +54,28 @@ function CommentForm({events, handleAddComment}) {
                     form={form}
                     initialValues={{comment: ''}}
                     onValuesChange={onValuesChange}
+                    style={{justifyContent: 'center'}}
                 >
-                    <Form.Item field='comment'>
+                    <Form.Item field='comment' >
                         <Input.TextArea 
                             placeholder="Add a comment... " 
                             maxLength={{ length: 500, errorOnly: true}}
                             showWordLimit
                             autoSize
                             wrapperStyle={{width: 250}}
+                            style = {{right: 80}}
                         />
                     </Form.Item>
                 </Form>
                 }
+                actions={[
+                    <Button key='0' type='secondary' style={{right:80}}>    
+                        Cancel
+                    </Button>,
+                    <Button key='1' type='primary' onClick={onSubmit} style={{right: 75}}>
+                        Post
+                    </Button>,
+                    ]}
                 />
     )
 }

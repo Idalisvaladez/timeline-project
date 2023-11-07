@@ -517,6 +517,26 @@ class Likes(Resource):
     def get(self):
         likes = [like.to_dict(rules = ('-event', '-comments','-user',)) for like in Like.query.all()]
         return make_response(likes, 200)
+    
+
+    def post(self):
+        data = request.json
+
+        
+        try:
+            new_like = Like(
+                liked = data['liked'],
+                user_id = data['user_id'],
+                event_id = data['event_id'],
+            )
+
+            db.session.add(new_like)
+            db.session.commit()
+
+            return make_response(new_like.to_dict(only= ('id', 'liked', 'event_id', 'user_id',)), 201)
+            
+        except ValueError:
+            return make_response({"errors": ["validation errors"]}, 400)
 
 api.add_resource(Likes, '/likes')
 
@@ -525,13 +545,14 @@ class LikesByEvent(Resource):
     def get(self, id):
         event = Event.query.filter_by(id = id).first()
         if event:
-            likes = [like.to_dict(only = ('liked',)) for like in Like.query.all()]
+            likes = [like.to_dict(rules = ('-event', '-user',)) for like in Like.query.all()]
 
 
             return make_response(likes, 200)
         else:
             return make_response({"error": "No user found"}, 404)
         
+    
 
 
 api.add_resource(LikesByEvent, '/events/<int:id>/likes')
@@ -563,6 +584,17 @@ class LikeByID(Resource):
             except ValueError as e:
                 print(e)
                 return make_response({"errors": ["validation errors"]}, 400)
+        else:
+            return make_response({"error": "No like found"}, 404)
+        
+    def delete(self, id):
+        like = Like.query.filter_by(id = id).first()
+
+        if like:
+            db.session.delete(like)
+            db.session.commit()
+
+            return make_response({"Successfully deleted": True}, 204)
         else:
             return make_response({"error": "No like found"}, 404)
 
