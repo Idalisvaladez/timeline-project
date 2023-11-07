@@ -7,6 +7,7 @@ import { useUser } from '../components/UserDetails';
 import Create from './Create';
 import UserInfo from '../components/UserInfo';
 import EventsList from '../components/EventsList';
+import MyLikes from '../components/MyLikes';
 
 
 const MenuItem = Menu.Item;
@@ -18,9 +19,10 @@ const normalWidth = 220;
 
 
 
-function ProfilePage({events, handleDeleteMyEvent, handleAddEvent, handleUpdateEvent}) {
+function ProfilePage({events, handleDeleteMyEvent, handleAddEvent, handleUpdateEvent, users, likes}) {
     const [collapsed, setCollapsed] = useState(false);
     const [siderWidth, setSiderWidth] = useState(normalWidth);
+    const [likedEvent, setLikedEvent] = useState(false)
     const [userDetails, setUserDetails] = useUser();
     const navigate = useNavigate();
 
@@ -45,6 +47,7 @@ function ProfilePage({events, handleDeleteMyEvent, handleAddEvent, handleUpdateE
       navigate('/login')
   }
 
+  
 
     return (
         <Layout className='byte-layout-collapse-demo' style={{
@@ -90,7 +93,7 @@ function ProfilePage({events, handleDeleteMyEvent, handleAddEvent, handleUpdateE
             <Button
             type='primary'
             style ={{
-                background: '#7BE188',
+                background: '#CBE0C3',
                 position: 'absolute',
                 bottom: 0,
                 width: '100%',
@@ -108,12 +111,19 @@ function ProfilePage({events, handleDeleteMyEvent, handleAddEvent, handleUpdateE
             </Button>
           </Menu>
         </Sider>
-        <Content >
+        <Content className='acro-layout-content'>
             <div>
-              <UserInfo />
+              <UserInfo users ={users}/>
             </div>
-              <EventsList events ={events} handleDeleteMyEvent={handleDeleteMyEvent} handleUpdateEvent={handleUpdateEvent}/>
+            <Menu mode='horizontal'>
+              <MenuItem onClick = {() => {setLikedEvent(!likedEvent)}}>My Events</MenuItem>
+              <MenuItem onClick = {() => {setLikedEvent(!likedEvent)}}>Liked Events</MenuItem>
+            </Menu>
             
+            <div>
+            {likedEvent ? <MyLikes events ={events} likes ={likes} /> : <EventsList events ={events} handleDeleteMyEvent={handleDeleteMyEvent} handleUpdateEvent={handleUpdateEvent}/>}
+              
+            </div>
         </Content>
       </Layout>
     )

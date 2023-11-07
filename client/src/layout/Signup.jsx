@@ -2,7 +2,7 @@ import React from 'react';
 import { useRef, useEffect, useState, useContext } from 'react';
 import '@arco-design/web-react/dist/css/arco.css';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+
 
 
 import {
@@ -13,7 +13,7 @@ import {
   Typography,
   Link,
 } from '@arco-design/web-react';
-import { userDetailsContext } from '../components/UserDetails';
+import { useUser} from '../components/UserDetails';
 const FormItem = Form.Item;
 
 const formItemLayout = {
@@ -37,7 +37,7 @@ function Signup() {
     const [size, setSize] = useState('default');
     const [layout, setLayout] = useState('vertical');
     const navigate = useNavigate();
-    const [userDetails, SetUserDetails] = useContext(userDetailsContext);
+    const [userDetails, SetUserDetails] = useUser();
     const [userExists, setUserExists] = useState(false)
 
     useEffect(() => {
