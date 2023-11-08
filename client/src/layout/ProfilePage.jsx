@@ -19,7 +19,7 @@ const normalWidth = 220;
 
 
 
-function ProfilePage({events, handleDeleteMyEvent, handleAddEvent, handleUpdateEvent, users, likes}) {
+function ProfilePage({events, handleDeleteMyEvent, handleAddEvent, handleUpdateEvent, users, likes, handleDeleteLike}) {
     const [collapsed, setCollapsed] = useState(false);
     const [siderWidth, setSiderWidth] = useState(normalWidth);
     const [likedEvent, setLikedEvent] = useState(false)
@@ -121,7 +121,7 @@ function ProfilePage({events, handleDeleteMyEvent, handleAddEvent, handleUpdateE
             </Menu>
             
             <div>
-            {likedEvent ? <MyLikes events ={events} likes ={likes} /> : <EventsList events ={events} handleDeleteMyEvent={handleDeleteMyEvent} handleUpdateEvent={handleUpdateEvent}/>}
+            {likedEvent ? <MyLikes events ={events} likes ={likes} users = {users} handleDeleteLike={handleDeleteLike}/> : <EventsList events ={events} handleDeleteMyEvent={handleDeleteMyEvent} handleUpdateEvent={handleUpdateEvent}/>}
               
             </div>
         </Content>

@@ -23,6 +23,8 @@ function Home({events, comments, users, handleAddEvent, handleAddComment, likes,
     const [siderWidth, setSiderWidth] = useState(normalWidth);
     const [userDetails, setUserDetails] = useUser();
     const navigate = useNavigate();
+
+    
   
 
     const onCollapse = (collapsed) => {

@@ -114,6 +114,7 @@ function App() {
                                               handleDeleteMyEvent={handleDeleteMyEvent} 
                                               handleAddEvent={handleAddEvent}
                                               handleUpdateEvent={handleUpdateEvent}
+                                              handleDeleteLike={handleDeleteLike}
                                               />}/>
           <Route path = '/create' element={<Create events = {events} users = {users} comments = {comments} />}/>
           <Route path = '/home' element={<Home 

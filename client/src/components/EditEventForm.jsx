@@ -49,8 +49,8 @@ function EditEventForm({events, handleUpdateEvent}) {
             onValuesChange={onValuesChange}
             initialValues={{description: ''}}
         >   
-            <Form.Item field='description' initialValue={description}>
-                <Input.TextArea autoSize />
+            <Form.Item field='description' initialValue={description} style={{position: 'relative', justifyContent: 'center'}}>
+                <Input.TextArea autoSize style={{backgroundColor: 'white'}}/>
             </Form.Item>
             <Button onClick={onSubmit}>Submit</Button>
         </Form>
