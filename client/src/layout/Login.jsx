@@ -148,7 +148,7 @@ function Login() {
                         maxWidth: 500,
                         height: 10, 
                         padding: 40,
-                        border: '1px solid var(--color-border)',
+                        borderTop: '1px solid var(--color-border)',
                         borderColor: 'black',
                         alignItems: 'center',
                         left: 0,
@@ -179,100 +179,6 @@ function Login() {
                 </Link>
                 </div>
             </div>
-      <Timeline 
-        direction='horizontal' 
-        mode={mode} 
-        labelPosition='relative'
-        style={{
-            position: 'relative',
-            border: '1px solid var(--color-border)',
-            borderColor: 'black',
-            bottom: 10,
-            width: '100%',
-            padding: 20,
-            margin: 'auto',
-            top: 300,
-            contain: 'content',
-            zIndex: -1,
-        }}
-      >
-        <TimelineItem lineColor='grey' dotColor='green'>
-          <Row align='center'>
-            <img
-              width='40'
-              style={imageStyle}
-              src='//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/b5d834b83708a269b4562924436eac48.png~tplv-uwbnlip3yd-png.png'
-            />
-            <div style={{ marginBottom: 12, }} >
-              Toutiao
-              <div style={{ fontSize: 12, color: '#4E5969', }} >
-                Founded in 2012
-              </div>
-            </div>
-          </Row>
-        </TimelineItem>
-        <TimelineItem>
-          <Row align='center'>
-            <img
-              width='40'
-              style={imageStyle}
-              src='//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/385ed540c359ec8a9b9ce2b5fe89b098.png~tplv-uwbnlip3yd-png.png'
-            />
-            <div style={{ marginBottom: 12, }} >
-              Xigua Video
-              <div style={{ fontSize: 12, color: '#4E5969', }} >
-                Founded in 2017
-              </div>
-            </div>
-          </Row>
-        </TimelineItem>
-        <TimelineItem>
-          <Row align='center'>
-            <img
-              width='40'
-              style={imageStyle}
-              src='//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/385ed540c359ec8a9b9ce2b5fe89b098.png~tplv-uwbnlip3yd-png.png'
-            />
-            <div style={{ marginBottom: 12, }} >
-              Xigua Video
-              <div style={{ fontSize: 12, color: '#4E5969', }} >
-                Founded in 2017
-              </div>
-            </div>
-          </Row>
-        </TimelineItem>
-        <TimelineItem>
-            <Row align='center'>
-                <div>
-                    Founded
-                </div>
-            </Row>
-        </TimelineItem>
-        <TimelineItem>
-            <Row align='center'>
-                <div>
-                    Founded
-                </div>
-            </Row>
-        </TimelineItem>
-        <TimelineItem>
-            <Row align='center'>
-                <div>
-                    Founded
-                </div>
-            </Row>
-        </TimelineItem>
-        <TimelineItem>
-          <Row align='center'>
-            <div style={{ marginBottom: 12, }} >
-              Pipidance
-              <div style={{ fontSize: 12, color: '#4E5969', }} >
-                Founded in 2018
-              </div>
-            </div>
-          </Row>
-        </TimelineItem>
-      </Timeline>
     </div>
     )
 }

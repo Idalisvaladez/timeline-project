@@ -7,9 +7,13 @@ const TimelineItem = Timeline.Item;
 const { Row, Col } = Grid;
 
 const imageStyle = {
-  width: 300,
-  height: 300,
-}
+    width: 400,
+  height: 400,
+  overflow: 'hidden',
+  objectFit: 'contain',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'white',
+  }
 
 function MyEvents({handleDeleteMyEvent, handleUpdateEvent, myEvents}) {
     const {id, description, picture, timestamp, user_id} = myEvents
@@ -42,8 +46,8 @@ function MyEvents({handleDeleteMyEvent, handleUpdateEvent, myEvents}) {
     
     const eventButtons = 
         <div>
-            <Button onClick={handleEditEvent}>Edit</Button>
-            <Button onClick={handleDelete}>X</Button>
+            <Button onClick={handleEditEvent} style = {{left: 134}}>Edit</Button>
+            <Button onClick={handleDelete} style = {{left: 134}}>Delete</Button>
         </div>
 
     return (
@@ -56,17 +60,18 @@ function MyEvents({handleDeleteMyEvent, handleUpdateEvent, myEvents}) {
             
         >
         <TimelineItem label={timestamp} >
-          <Row style={{ display: 'inline-grid', alignItems: 'stretch' }}>
+          <Row style={{ display: 'inline-grid', alignItems: 'stretch', paddingBottom: 10}}>
             <img
               width='40'
               style={imageStyle}
               src= {picture}
             />
-            <div style={{ marginBottom: 12, width:300, }}>
+            <div style={{alignItems: 'flex-end', width: 400, backgroundColor: 'whitesmoke', border: '1px solid var(--color-border)', gap:10}}>
               {description}
+              <div style={{ fontSize: 12, color: '#4E5969', backgroundColor: 'white', position: 'relative'}}>
               {user_id === userDetails.id ? eventButtons : ''}
               {edit ? <EditEventForm handleEditEvent={handleEditEvent} events ={myEvents} handleUpdateEvent={handleUpdateEvent}/> : null}
-              <div style={{ fontSize: 12, color: '#4E5969' }}></div>
+              </div>
             </div>
           </Row>
         </TimelineItem>

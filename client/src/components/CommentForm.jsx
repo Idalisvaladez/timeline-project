@@ -46,7 +46,7 @@ function CommentForm({events, handleAddComment}) {
                 align='left'
                 
                 avatar={
-                    <Avatar>
+                    <Avatar style={{position: 'relative'}}>
                         <img alt ={userDetails.username} src ={userDetails.profile_picture}/>
                     </Avatar>}
                 content={
@@ -62,17 +62,17 @@ function CommentForm({events, handleAddComment}) {
                             maxLength={{ length: 500, errorOnly: true}}
                             showWordLimit
                             autoSize
-                            wrapperStyle={{width: 250}}
-                            style = {{right: 80}}
+                            wrapperStyle={{width: 320}}
+                            style = {{position: 'relative', right: 10}}
                         />
                     </Form.Item>
                 </Form>
                 }
                 actions={[
-                    <Button key='0' type='secondary' style={{right:80}}>    
+                    <Button key='0' type='secondary' style={{position: 'relative'}}>    
                         Cancel
                     </Button>,
-                    <Button key='1' type='primary' onClick={onSubmit} style={{right: 75}}>
+                    <Button key='1' type='primary' onClick={onSubmit} style={{position: 'relative'}}>
                         Post
                     </Button>,
                     ]}

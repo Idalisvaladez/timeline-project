@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Timeline, Grid, Message, Avatar, Typography} from '@arco-design/web-react';
 import Comments from './Comments';
 import CommentForm from './CommentForm';
@@ -13,86 +13,109 @@ const TimelineItem = Timeline.Item;
 const { Row, Col } = Grid;
 
 const imageStyle = {
-  width: 300,
-  height: 300,
+  width: 400,
+  height: 400,
+  overflow: 'hidden',
+  objectFit: 'contain',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'white',
 }
 
 
 function Events({events, comments, users, handleAddComment, likes, handleAddLike, handleDeleteLike}) {
     const {id, description, picture, timestamp, user_id} = events
     const [userDetails, setUserDetails] = useUser();
-    const [clicked, setClicked] = useState(false);
     const [mode, setMode] = useState('alternate');
+    const [clicked, setClicked] = useState(false);
+    const [trueLikes, setTrueLikes] = useState([]);
 
   
 
     const filteredComments = comments.filter((comment) => comment.event_id === id)
     const displayComments = filteredComments.map((comment) => <Comments key ={comment.id} comments = {comment} users ={users}/>)
 
-    const eventLikes = likes.filter((like) => like.event_id === id)
-    const trueLikes = eventLikes.filter((like) => like.liked === true)
+    // Fetch and filter true likes when component mounts
+    useEffect(() => {
+      const eventLikes = likes.filter((like) => like.event_id === id);
+      const filteredTrueLikes = eventLikes.filter((like) => like.liked === true);
+      setTrueLikes(filteredTrueLikes);
+    }, [likes, id])
+    
 
-    const userLikes = trueLikes.filter((like) => like.user_id === userDetails.id)
-    const likeId = userLikes.map((like) =>  like.id)
+    // gets the like that user_id matches current user and event_id matches clicked event
+    const likeToDelete = likes.find((like) => like.user_id === userDetails.id && like.event_id === id)
 
+    // for the user_id of the liked data to compare to current user
+    const likesUser = trueLikes.map((like) => like.user_id)
+    
+    
+
+    //for event post user info
     const eventsUser = users.filter((user) => user.id === user_id)
     const eventsUsername = eventsUser.map((user) => user.username)
     const eventsUserPic = eventsUser.map((user) => user.profile_picture)
 
-    
 
     const onClick = (e) => {
       e.preventDefault();
-      setClicked(!clicked)
-      console.log(clicked)
-      // let new_like = {
-      //   liked: true,
-      //   event_id: id,
-      //   user_id: userDetails.id,
-      // }
-      // fetch("/likes", {
-      //     method: 'POST',
-      //     headers: {'Content-Type': 'application/json'},
-      //     body: JSON.stringify(new_like),
-      // })
-      // .then(res => {
-      //     if (res.status === 201) {
-      //         setClicked(!clicked)
-      //         return res.json()
-      //     } else if (res.status === 400) {
-      //         console.error('Error adding like')
-      //     }
-      // })
-      // .then(like => {
-      //   handleAddLike(like)
-      //   console.log(clicked)
-      // })
-
-      // .catch((error) => console.error('Error: ', error));
+      
+      // Check if the user already liked the post
+      const hasUserLiked = trueLikes.some((like) => like.user_id === userDetails.id);
+      if (!hasUserLiked) {
+        let new_like = {
+          liked: true,
+          event_id: id,
+          user_id: userDetails.id,
+        }
+      fetch("/likes", {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(new_like),
+      })
+      .then(res => {
+          if (res.status === 201) {
+              return res.json()
+          } else if (res.status === 400) {
+              console.error('Error adding like')
+          }
+      })
+      .then(like => {
+        handleAddLike(like)
+        setTrueLikes([...trueLikes, like])
+        setClicked(true)
+        localStorage.setItem('clicked', true);
+      })
+      .catch((error) => console.error('Error: ', error));
+    } else {
+      console.log('User already liked this post');
+    }
   }
 
   
     
   const handleDelete = (e) => {
-    setClicked(!clicked)
-    console.log(clicked)
-    // fetch(`/likes/${likeId[0]}`, {
-    //     method: 'DELETE',
-    // })
-    // .then(res => {
-    //     if (res.status === 204) {
-    //         handleDeleteLike(likeId[0])
-    //     } else if (res.status === 404) {
-    //         console.error('no like found for user')
-    //     }
-    // })
-    // .catch((error) => console.error(error))
+    if (likeToDelete) {
+      const likeId = likeToDelete.id 
+      fetch(`/likes/${likeId}`, {
+        method: 'DELETE',
+    })
+    .then(res => {
+        if (res.status === 204) {
+            handleDeleteLike(likeId)
+            setClicked(false)
+            localStorage.removeItem('clicked');
+        } else if (res.status === 404) {
+            console.error('no like found for user')
+        }
+    })
+    .catch((error) => console.error('Error deleting like: ', error))
+      }
 }
   
   
 
     return (
-        <div>
+        <div style = {{justifyContent: 'center'}}>
       
         <Timeline 
             mode={mode} 
@@ -101,7 +124,7 @@ function Events({events, comments, users, handleAddComment, likes, handleAddLike
             reverse = {true}
         >
               <TimelineItem key={id}label={timestamp}>
-              <div style={{ position: 'relative', display: 'flex', paddingBottom: 5, backgroundColor: 'whitesmoke', width: 300}}>
+              <div style={{ position: 'relative', display: 'flex', paddingBottom: 5, backgroundColor: 'whitesmoke', width: 400, border: '1px solid var(--color-border)'}}>
                 <Avatar >
                     <img 
                       src ={eventsUserPic}
@@ -116,14 +139,14 @@ function Events({events, comments, users, handleAddComment, likes, handleAddLike
                   src= {picture}
                 />
               </Row>
-              <div style={{ marginBottom: 12, width:300, display: 'flex', position: 'relative', backgroundColor: 'whitesmoke'}}>
+              <div style={{ marginBottom: 12, width:400, display: 'flex', position: 'relative', backgroundColor: 'whitesmoke', border: '1px solid var(--color-border)'}}>
                       {trueLikes.length}
                       {clicked ? <IconHeartFill style = {{fontSize: 25, strokeLinecap: 'round', color: 'red'}} onClick={handleDelete}/> : <IconHeart style = {{fontSize: 25, strokeLinecap: 'round'}} onClick={onClick}/> }
-                    <div style = {{alignItems: 'flex-end', width: 250, backgroundColor: 'whitesmoke'}}>
+                    <div style = {{alignItems: 'flex-end', width: 250, backgroundColor: 'whitesmoke',}}>
                       {description}
                     </div>
                 </div>
-                <div style={{ fontSize: 12, backgroundColor: 'white', overflow: 'scroll', maxHeight: 200, width: 300, position: 'relative',}}>
+                <div style={{ fontSize: 12, backgroundColor: 'white', overflow: 'scroll', maxHeight: 200, width: 400, position: 'relative',}}>
                   {displayComments}
                 </div>
                 <div style={{position: 'relative', paddingTop: 5}}>
