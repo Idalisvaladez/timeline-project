@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import { Modal, Form, Input, Upload, Button, Message} from "@arco-design/web-react";
 import { useUser } from '../components/UserDetails';
+import apiKey from "../ApiKey";
 
 
 const FormItem = Form.Item
@@ -18,6 +19,7 @@ function CreateForm({handleAddEvent, visible, setVisible}) {
     const [userDetails, setUserDetails] = useUser();
     const [newEvent, setNewEvent] = useState([]);
     const [userId, setUserId] = useState('')
+    const [eventUrl, setEventUrl] = useState('');
     const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
 
@@ -28,12 +30,30 @@ function CreateForm({handleAddEvent, visible, setVisible}) {
         console.log("this is the event info: ", newEvent, userId)
       };
 
+
+      const uploadImage = (files) => {
+        console.log(files)
+
+        const formData = new FormData()
+        formData.append('file', files)
+        formData.append('upload_preset', 'q9tpgtm7')
+        formData.append('api_key', apiKey)
+
+        fetch('https://api.cloudinary.com/v1_1/idvalacloud/image/upload', {
+            method: 'POST',
+            body: formData,
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            setEventUrl(data.secure_url)
+        })
+    }
     
       const onSubmit = (e) => {
         e.preventDefault();
         let new_event = {
             description: newEvent.description,
-            picture: newEvent.picture,
+            picture: eventUrl,
             user_id: userId,
         }
         fetch("/events", {
@@ -78,7 +98,7 @@ function CreateForm({handleAddEvent, visible, setVisible}) {
                 label='Picture'
                 field='picture'
                 >
-                    <Input style={{ width: 390 }} rules = {{required: true}} allowClear  placeholder='url' />
+                    <Upload drag field='file' onDrop={(event) => {uploadImage(event.dataTransfer.files[0])}}/>
             </Form.Item>
             <FormItem label='Caption' field='description' rules={[{ required: true }]}>
                     <Input.TextArea 

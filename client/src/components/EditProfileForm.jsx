@@ -1,9 +1,8 @@
 import React from "react";
-import { useRef, useEffect, useState, useContext } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import '@arco-design/web-react/dist/css/arco.css';
-import { useNavigate } from 'react-router-dom';
-import { IconUser, IconPen, IconEmail, IconImage } from "@arco-design/web-react/icon";
 import '../layout/EditProfileForm.css'
+
 
 
 import {
@@ -12,11 +11,11 @@ import {
   Button,
   Message,
   Typography,
-  Divider,
-  Avatar
+  Upload,
 } from '@arco-design/web-react';
 import { useUser } from "./UserDetails";
-const {Title} = Typography;
+import apiKey from "../ApiKey";
+
 
 const formItemLayout = {
   labelCol: {
@@ -40,15 +39,15 @@ function EditProfileForm({users, handleUpdateUser}) {
     const formRef = useRef();
     const [size, setSize] = useState('default');
     const [layout, setLayout] = useState('vertical');
-    const navigate = useNavigate();
     const [userDetails, SetUserDetails] = useUser();
+    const [photoUrl, setPhotoUrl] = useState(userDetails.profile_picture);
+
     const curUser = users.filter((user) => user.id === userDetails.id)
     const [updateUser, setUpdateUser] = useState([]);
    
 
+   
     
-    
-    const curPic = curUser.map((user) =>  user.profile_picture)
     const curUsername = curUser.map((user) => user.username)
     const curEmail = curUser.map((user) => user.email)
 
@@ -57,19 +56,37 @@ function EditProfileForm({users, handleUpdateUser}) {
       });
     }, []);
 
+    const uploadImage = (files) => {
+        console.log(files)
+
+        const formData = new FormData()
+        formData.append('file', files)
+        formData.append('upload_preset', 'q9tpgtm7')
+        formData.append('api_key', apiKey)
+
+        fetch('https://api.cloudinary.com/v1_1/idvalacloud/image/upload', {
+            method: 'POST',
+            body: formData,
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            setPhotoUrl(data.secure_url)
+        })
+    }
+    
 
       const onValuesChange = (changeValue, values) => {
-        console.log(values)
         setUpdateUser(values)
-        console.log(updateUser)
+        console.log(values)
       };
+
 
     const onSubmit = (e) => {
         e.preventDefault();
         let update_user = {
             username: updateUser.username,
             email: updateUser.email,
-            profile_picture: updateUser.profile_picture,
+            profile_picture: photoUrl,
         }
         fetch(`/users/${userDetails.id}`, {
             method: 'PATCH',
@@ -85,9 +102,8 @@ function EditProfileForm({users, handleUpdateUser}) {
             }
         })
         .then((data) => {
-            console.log(curUser)
             handleUpdateUser(data)
-            console.log(data)
+            SetUserDetails(data)
         })
         .catch((error) => console.log(error))
     }
@@ -140,7 +156,7 @@ function EditProfileForm({users, handleUpdateUser}) {
                 <Input placeholder={curEmail} />
             </FormItem>
             <FormItem label='Profile Picture' field='profile_picture'  style={{width: 500}}>
-                <Input placeholder={curPic} />
+                <Upload drag field='file' onDrop={(event) => {uploadImage(event.dataTransfer.files[0])}}/>
             </FormItem>
             
             <FormItem {...noLabelLayout}>

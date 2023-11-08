@@ -44,6 +44,9 @@ function EditProfile({users, handleUpdateUser}) {
       navigate('/login')
   }
 
+
+    
+
     return (
         <Layout className='byte-layout-collapse-demo' style={{
             height: '100%',

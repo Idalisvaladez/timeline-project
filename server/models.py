@@ -16,7 +16,7 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String)
     username = db.Column(db.String, unique = True)
     _password_hash = db.Column(db.String, nullable = False)
-    profile_picture = db.Column(db.String, default = "https://pixabay.com/get/g85c3c97d1b6da4d7313d19607b5cc476c22a932d3ef3f2f583e5a52be957a98dda28167e027b7023b80462a4559ae1533d2c659e2408af13b2663921c385d2980f4c00a686e4b3c2efee025938b13916_640.png")
+    profile_picture = db.Column(db.String, default = "https://icons.veryicon.com/png/o/education-technology/alibaba-big-data-oneui/user-profile.png")
 
     # Relationship to intermediary models
     comments = db.relationship('Comment', backref = 'user', cascade= 'all, delete-orphan')

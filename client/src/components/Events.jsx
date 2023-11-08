@@ -24,6 +24,8 @@ function Events({events, comments, users, handleAddComment, likes, handleAddLike
     const [clicked, setClicked] = useState(false);
     const [mode, setMode] = useState('alternate');
 
+  
+
     const filteredComments = comments.filter((comment) => comment.event_id === id)
     const displayComments = filteredComments.map((comment) => <Comments key ={comment.id} comments = {comment} users ={users}/>)
 
@@ -36,6 +38,7 @@ function Events({events, comments, users, handleAddComment, likes, handleAddLike
     const eventsUser = users.filter((user) => user.id === user_id)
     const eventsUsername = eventsUser.map((user) => user.username)
     const eventsUserPic = eventsUser.map((user) => user.profile_picture)
+
     
 
     const onClick = (e) => {
@@ -97,37 +100,36 @@ function Events({events, comments, users, handleAddComment, likes, handleAddLike
             style = {{ padding: 20}}
             reverse = {true}
         >
-        <TimelineItem label={timestamp}>
-          <div style={{ position: 'relative', display: 'flex', paddingBottom: 5}}>
-            <Avatar >
-                <img 
-                  src ={eventsUserPic}
+              <TimelineItem key={id}label={timestamp}>
+              <div style={{ position: 'relative', display: 'flex', paddingBottom: 5, backgroundColor: 'whitesmoke', width: 300}}>
+                <Avatar >
+                    <img 
+                      src ={eventsUserPic}
+                    />
+                </Avatar>
+                <Typography.Text style={{fontSize: 15}}> @{eventsUsername}</Typography.Text>
+              </div>
+              <Row style={{alignItems: 'stretch',}}>
+                <img
+                  width='40'
+                  style={imageStyle}
+                  src= {picture}
                 />
-            </Avatar>
-            <Typography.Text style={{fontSize: 15}}> @{eventsUsername}</Typography.Text>
-          </div>
-          <Row style={{alignItems: 'stretch',}}>
-            <img
-              width='40'
-              style={imageStyle}
-              src= {picture}
-            />
-          </Row>
-          <div style={{ marginBottom: 12, width:300, display: 'flex'}}>
-                  {trueLikes.length}
-                  {clicked ? <IconHeartFill style = {{fontSize: 25, strokeLinecap: 'round', color: 'red'}} onClick={handleDelete}/> : <IconHeart style = {{fontSize: 25, strokeLinecap: 'round'}} onClick={onClick}/> }
-                <div style = {{alignItems: 'flex-end', width: 250}}>
-                  {description}
+              </Row>
+              <div style={{ marginBottom: 12, width:300, display: 'flex', position: 'relative', backgroundColor: 'whitesmoke'}}>
+                      {trueLikes.length}
+                      {clicked ? <IconHeartFill style = {{fontSize: 25, strokeLinecap: 'round', color: 'red'}} onClick={handleDelete}/> : <IconHeart style = {{fontSize: 25, strokeLinecap: 'round'}} onClick={onClick}/> }
+                    <div style = {{alignItems: 'flex-end', width: 250, backgroundColor: 'whitesmoke'}}>
+                      {description}
+                    </div>
                 </div>
-            </div>
-            <div style={{ fontSize: 12, backgroundColor: 'white', overflow: 'scroll', maxHeight: 200, width: 300,}}>
-              {displayComments}
-            </div>
-            <div style={{position: 'relative', paddingTop: 5}}>
-              <CommentForm events ={events} handleAddComment={handleAddComment}/>
-            </div>
-        </TimelineItem>
-        
+                <div style={{ fontSize: 12, backgroundColor: 'white', overflow: 'scroll', maxHeight: 200, width: 300, position: 'relative',}}>
+                  {displayComments}
+                </div>
+                <div style={{position: 'relative', paddingTop: 5}}>
+                  <CommentForm events ={events} handleAddComment={handleAddComment}/>
+                </div>
+            </TimelineItem>
       </Timeline>
     </div>
     )
